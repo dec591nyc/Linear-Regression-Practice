@@ -275,7 +275,7 @@ plot_config = {"displayModeBar": False, "responsive": True}
 st.markdown(
     f"""
     <style>
-    [data-testid="stToolbar"], .stAppToolbar, #MainMenu, footer {{
+    .stAppToolbar, #MainMenu, footer {{
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
@@ -300,10 +300,27 @@ st.markdown(
     [data-testid="stHeader"] {{
         background: {theme["bg"]} !important;
     }}
-    [data-testid="stHeader"] *,
-    [data-testid="stToolbar"] *,
-    .stAppToolbar * {{
+    [data-testid="stHeader"] * {{
         color: {theme["text"]} !important;
+    }}
+    [data-testid="stToolbar"],
+    [data-testid="stToolbar"] *,
+    [data-testid="collapsedControl"],
+    [data-testid="collapsedControl"] *,
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarCollapseButton"] *,
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebarCollapsedControl"] * {{
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        color: {theme["text"]} !important;
+        fill: {theme["text"]} !important;
+    }}
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapsedControl"] {{
+        display: flex !important;
+        z-index: 1000 !important;
     }}
     [data-testid="stSidebar"],
     section[data-testid="stSidebar"] {{
