@@ -208,6 +208,10 @@ THEMES = {
         "metric_bg": "#ffffff",
         "metric_value": "#0f172a",
         "plot_bg": "#ffffff",
+        "plot_text": "#111827",
+        "plot_muted": "#334155",
+        "plot_grid": "#cbd5e1",
+        "plot_axis": "#475569",
         "control_bg": "#ffffff",
         "control_text": "#111827",
         "control_muted": "#6b7280",
@@ -223,6 +227,10 @@ THEMES = {
         "metric_bg": "#182235",
         "metric_value": "#f8fafc",
         "plot_bg": "#111827",
+        "plot_text": "#f8fafc",
+        "plot_muted": "#cbd5e1",
+        "plot_grid": "#334155",
+        "plot_axis": "#94a3b8",
         "control_bg": "#111827",
         "control_text": "#f8fafc",
         "control_muted": "#a8b3c7",
@@ -230,6 +238,7 @@ THEMES = {
 }
 theme = THEMES[st.session_state.theme]
 plot_template = "plotly_dark" if st.session_state.theme == "dark" else "plotly_white"
+plot_config = {"displayModeBar": False, "responsive": True}
 
 st.markdown(
     f"""
@@ -306,6 +315,25 @@ st.markdown(
     [data-testid="stNumberInput"] input {{
         color: {theme["control_text"]} !important;
         fill: {theme["control_text"]} !important;
+    }}
+    [data-testid="stNumberInput"] button {{
+        background: {theme["control_bg"]} !important;
+        color: {theme["control_text"]} !important;
+        border-color: {theme["border"]} !important;
+    }}
+    [data-testid="stNumberInput"] button svg {{
+        color: {theme["control_text"]} !important;
+        fill: {theme["control_text"]} !important;
+    }}
+    [data-baseweb="popover"],
+    [data-baseweb="popover"] [role="listbox"],
+    [data-baseweb="popover"] [role="option"] {{
+        background: {theme["control_bg"]} !important;
+        color: {theme["control_text"]} !important;
+    }}
+    [data-baseweb="popover"] [role="option"]:hover {{
+        background: {theme["note_bg"]} !important;
+        color: {theme["control_text"]} !important;
     }}
     [data-baseweb="tag"] {{
         background: #ef6359 !important;
@@ -458,6 +486,19 @@ st.markdown(
         color: {theme["accent"]} !important;
         font-weight: 650;
     }}
+    .js-plotly-plot .modebar {{
+        display: none !important;
+    }}
+    .js-plotly-plot .main-svg text {{
+        fill: {theme["plot_text"]} !important;
+        opacity: 1 !important;
+    }}
+    .js-plotly-plot .legendtext,
+    .js-plotly-plot .cbtitle,
+    .js-plotly-plot .cbaxis text {{
+        fill: {theme["plot_muted"]} !important;
+        opacity: 1 !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -520,6 +561,45 @@ def safe_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     ss_res = float(np.sum((y_true - y_pred) ** 2))
     ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
     return 1 - ss_res / ss_tot if ss_tot else 0.0
+
+
+def apply_plot_style(fig: go.Figure, height: int, title: str | None = None) -> go.Figure:
+    fig.update_layout(
+        height=height,
+        template=plot_template,
+        paper_bgcolor=theme["plot_bg"],
+        plot_bgcolor=theme["plot_bg"],
+        font={"color": theme["plot_text"], "size": 13},
+        title={"text": title} if title else None,
+        title_font={"color": theme["plot_text"], "size": 18},
+        legend={
+            "font": {"color": theme["plot_text"], "size": 12},
+            "bgcolor": "rgba(0,0,0,0)",
+            "bordercolor": "rgba(0,0,0,0)",
+        },
+        coloraxis_colorbar={
+            "title": {"font": {"color": theme["plot_text"], "size": 13}},
+            "tickfont": {"color": theme["plot_text"], "size": 12},
+        },
+        margin={"l": 72, "r": 44, "t": 60 if title else 36, "b": 64},
+    )
+    fig.update_xaxes(
+        title_font={"color": theme["plot_text"], "size": 14},
+        tickfont={"color": theme["plot_text"], "size": 12},
+        gridcolor=theme["plot_grid"],
+        zerolinecolor=theme["plot_grid"],
+        linecolor=theme["plot_axis"],
+        showline=True,
+    )
+    fig.update_yaxes(
+        title_font={"color": theme["plot_text"], "size": 14},
+        tickfont={"color": theme["plot_text"], "size": 12},
+        gridcolor=theme["plot_grid"],
+        zerolinecolor=theme["plot_grid"],
+        linecolor=theme["plot_axis"],
+        showline=True,
+    )
+    return fig
 
 
 def normalize_aqi_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -763,17 +843,9 @@ def synthetic_lab() -> None:
     )
     fig.add_trace(go.Scatter(x=x_line, y=true_line, mode="lines", name=t("true_line"), line={"dash": "dash"}))
     fig.add_trace(go.Scatter(x=x_line, y=fitted_line, mode="lines", name=t("regression_line")))
-    fig.update_layout(
-        height=500,
-        xaxis_title="x",
-        yaxis_title="y",
-        legend_orientation="h",
-        template=plot_template,
-        paper_bgcolor=theme["plot_bg"],
-        plot_bgcolor=theme["plot_bg"],
-        font={"color": theme["text"], "size": 13},
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    apply_plot_style(fig, height=500)
+    fig.update_layout(xaxis_title="x", yaxis_title="y", legend_orientation="h")
+    st.plotly_chart(fig, use_container_width=True, config=plot_config)
 
     st.markdown(f"#### {t('outliers')}")
     st.dataframe(
@@ -865,14 +937,8 @@ def aqi_case() -> None:
                 line={"dash": "dash", "color": "#475569"},
             )
         )
-        fig.update_layout(
-            height=440,
-            template=plot_template,
-            paper_bgcolor=theme["plot_bg"],
-            plot_bgcolor=theme["plot_bg"],
-            font={"color": theme["text"], "size": 13},
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        apply_plot_style(fig, height=440, title=t("actual_predicted"))
+        st.plotly_chart(fig, use_container_width=True, config=plot_config)
     with right:
         st.markdown(f"#### {t('coefficients')}")
         st.dataframe(coefficient_df, use_container_width=True, hide_index=True)
