@@ -14,6 +14,9 @@ Context:
 Design goals:
 1. Prioritize readability and trust over decoration.
 2. Use a clean light mode first, then adapt dark mode.
+   - Normal text should target at least WCAG AA 4.5:1 contrast.
+   - Icons, borders, chart labels, and active controls should target at least 3:1 contrast.
+   - Do not use broad selectors like `[data-testid="stAppViewContainer"] *` unless every affected component is visually checked.
 3. Keep typography restrained:
    - Main title: 28-34px equivalent.
    - Section headings: 18-22px.
@@ -27,6 +30,7 @@ Design goals:
    - Slider labels
    - File/download buttons
    - Dataframes
+   - Plotly chart axes, legends, color bars, and hover labels
 5. Avoid using white text on light backgrounds or dark widgets embedded in light mode unless intentionally styled.
 6. Replace purely textual toggles with recognizable icon + short label controls, such as language and theme buttons.
 7. Do not add upload features unless the accepted schema is documented and validated.
@@ -56,7 +60,11 @@ Before coding, state:
 
 After coding, verify:
 - No unreadable text in light mode.
+- No dark-mode background or widget residue remains in light mode.
+- No chart title renders as `undefined`.
 - No duplicate Streamlit widget keys.
 - App runs without StreamlitDuplicateElementId.
 - The first screen explains what the app does without requiring math knowledge.
+- Every model section states its data source and scope.
+- Data tables use foreground/background colors that match the active theme.
 ```

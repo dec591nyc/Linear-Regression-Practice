@@ -1,21 +1,51 @@
-# Data Source Evaluation
+# Data Source
 
-## Recommended classroom source
+## Active AQI Data
 
-Kaggle `Taiwan Air Quality Index Data 2016~2024` is the preferred reproducible source for the air-quality case because it already packages Taiwan AQI records for machine-learning practice. The dataset theme also maps naturally to Taichung and Changhua through station or county fields.
+The AQI page uses `data/central_taiwan_aqi_sample.csv`.
 
-## Official replacement source
+- Rows: 82,034
+- Scope: Taichung, Changhua, and Nantou air-quality records
+- Fields: station, county, publish time, Air Quality Index (AQI), PM2.5, PM10, O3, NO2, CO, SO2, wind speed, wind direction, longitude, latitude, and site id
+- Purpose: support a practical linear-regression case with enough rows for residual ranking and model comparison
 
-The official replacement source is Ministry of Environment `AQX_P_432`, the hourly station-level AQI open dataset. Its fields include station name, county, AQI, pollutant, status, SO2, CO, O3, PM10, PM2.5, NO2, wind speed, wind direction, publish time, longitude, latitude, and site id.
+The 24-row demo fallback has been removed. If `central_taiwan_aqi_sample.csv` is unavailable, the project should use another sufficiently large public dataset or change the research case.
 
-## Why AQI fits this assignment
+## Lab Data
 
-- The target is numeric, such as AQI or PM2.5.
-- The features are numeric pollutants and weather-related readings.
-- Linear regression can be used as a simple baseline.
-- Residual ranking can identify unusual observations that the model cannot explain well.
-- Taichung and Changhua are directly meaningful as location filters, not only as a loose background story.
+The Lab page does not use teacher-provided data, Kaggle data, MOENV data, or any CSV file.
 
-## Design boundary
+Lab data is generated inside `app.py` from:
 
-The AQI case and the synthetic `n/a/b/var` sandbox are intentionally separated. The sandbox keeps the baseline regression workflow clear, while the AQI case gives the project a more practical operating context.
+```text
+y = a*x + b + noise
+```
+
+The sidebar controls are the data-generation source for Lab:
+
+- sample size `n`
+- slope `a`
+- intercept `b`
+- noise variance
+- random seed
+
+This separation is intentional. Lab teaches the mechanics of linear regression; AQI applies the same modeling workflow to real air-quality records.
+
+## Reference Sources
+
+Kaggle `Taiwan Air Quality Index Data 2016~2024` is kept as a reproducible historical reference:
+https://www.kaggle.com/datasets/taweilo/taiwan-air-quality-data-20162024
+
+MOENV `AQX_P_488` is the preferred official historical AQI source:
+https://data.moenv.gov.tw/en/dataset/detail/aqx_p_488
+
+MOENV `AQX_P_432` is the real-time hourly AQI reference:
+https://data.moenv.gov.tw/dataset/detail/aqx_p_432
+
+## Design Boundary
+
+Sidebar controls behave differently by page:
+
+- Lab controls change the synthetic data itself.
+- AQI controls filter the active CSV and change model settings.
+- Lab parameters such as slope, intercept, noise variance, and seed do not modify AQI records.
