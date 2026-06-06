@@ -9,15 +9,21 @@ import plotly.graph_objects as go
 import streamlit as st
 
 try:
-    from sklearn.linear_model import LinearRegression
+    from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge
     from sklearn.metrics import r2_score
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
 except Exception:  # pragma: no cover - fallback keeps the demo readable without sklearn.
+    ElasticNet = None
+    Lasso = None
     LinearRegression = None
+    Ridge = None
+    StandardScaler = None
+    make_pipeline = None
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 SAMPLE_AQI_PATH = PROJECT_ROOT / "data" / "central_taiwan_aqi_sample.csv"
-CRISP_REPORT_PATH = PROJECT_ROOT / "docs" / "crisp_dm_report.md"
 CENTRAL_COUNTIES = ["臺中市", "台中市", "彰化縣"]
 DEFAULT_SOURCE_NAME = "Kaggle Taiwan Air Quality Index Data 2016~2024"
 DEFAULT_SOURCE_URL = "https://www.kaggle.com/datasets/taweilo/taiwan-air-quality-data-20162024"
@@ -53,6 +59,18 @@ TEXT = {
         "rmse": "RMSE",
         "mae": "MAE",
         "model": "Model",
+        "model_choice": "Linear model",
+        "model_comparison": "Linear model comparison",
+        "model_profile_title": "Model reading",
+        "model_ols": "OLS Linear Regression",
+        "model_ridge": "Ridge Regression",
+        "model_lasso": "Lasso Regression",
+        "model_elasticnet": "ElasticNet Regression",
+        "model_ols_reading": "OLS is the clearest baseline. It is easy to explain, but it can become unstable when pollutant fields move together.",
+        "model_ridge_reading": "Ridge keeps all selected features but shrinks their influence. It is useful when PM2.5, PM10 and other pollutants are correlated.",
+        "model_lasso_reading": "Lasso can shrink weak feature effects toward zero. It is useful for feature screening, but it may be too aggressive on a small sample.",
+        "model_elasticnet_reading": "ElasticNet balances Ridge and Lasso. It is a practical compromise when features are correlated but some simplification is still useful.",
+        "coefficient_note": "For Ridge, Lasso and ElasticNet, coefficients are based on standardized inputs, so compare direction and relative size rather than raw units.",
         "equation": "Estimated equation",
         "generated_data": "Generated data",
         "outliers": "Top 10 residual outliers",
@@ -70,11 +88,12 @@ TEXT = {
         "actual_predicted": "Actual vs Predicted",
         "perfect_prediction": "Perfect prediction",
         "source_panel_title": "Default data source",
-        "source_panel_body": "The bundled sample is a compact central Taiwan AQI example shaped from the same field logic as Taiwan AQI open-data records. It is small enough for a classroom demo while keeping the same numeric modeling workflow.",
+        "source_panel_body": "Current app run uses the bundled central Taiwan AQI sample. It is a compact classroom demo dataset with fields aligned to Taiwan AQI open data, not a live API pull. Kaggle is the recommended reproducible dataset reference; MOENV AQX_P_432 is the official replacement source for production use.",
         "download_data": "Download sample CSV",
         "download_report": "Download CRISP-DM report",
         "source_title": "Data Source Evaluation",
         "source_body": """
+        - Current app run uses the bundled `data/central_taiwan_aqi_sample.csv` sample for modeling and charting.
         - Kaggle `Taiwan Air Quality Index Data 2016~2024` is useful for reproducible modeling practice because the data has already been collected and shaped for analysis.
         - The official replacement source is MOENV `AQX_P_432`, which provides hourly station-level AQI and pollutant fields.
         - Kaggle is convenient for a portfolio demo; the official API is better for production because it is closer to the source of truth.
@@ -130,6 +149,18 @@ TEXT = {
         "rmse": "RMSE",
         "mae": "MAE",
         "model": "模型",
+        "model_choice": "線性模型",
+        "model_comparison": "線性模型比較",
+        "model_profile_title": "模型解讀",
+        "model_ols": "OLS 普通最小平方法",
+        "model_ridge": "Ridge 迴歸",
+        "model_lasso": "Lasso 迴歸",
+        "model_elasticnet": "ElasticNet 迴歸",
+        "model_ols_reading": "OLS 是最清楚的 baseline，容易解釋，但污染物欄位彼此高度相關時，係數可能不穩定。",
+        "model_ridge_reading": "Ridge 會保留所有選取特徵，但降低個別特徵的影響力；當 PM2.5、PM10 等污染物彼此相關時，通常較穩定。",
+        "model_lasso_reading": "Lasso 會把較弱的特徵影響壓向 0，適合做特徵篩選；但在小型 sample 上可能過度簡化。",
+        "model_elasticnet_reading": "ElasticNet 折衷 Ridge 與 Lasso，適合特徵彼此相關、但仍希望模型稍微簡化的情境。",
+        "coefficient_note": "Ridge、Lasso、ElasticNet 的係數來自標準化輸入，適合比較方向與相對影響，不宜直接解讀為原始單位。",
         "equation": "估計方程式",
         "generated_data": "模擬資料",
         "outliers": "殘差前 10 名",
@@ -147,11 +178,12 @@ TEXT = {
         "actual_predicted": "實際值與預測值",
         "perfect_prediction": "理想預測線",
         "source_panel_title": "預設資料來源",
-        "source_panel_body": "內建 sample 是一份中彰 AQI 小型示範資料，欄位邏輯對齊台灣空氣品質開放資料。它保留 AQI、污染物、風速、測站與縣市欄位，適合用來示範數值建模流程。",
+        "source_panel_body": "目前 app 實際執行使用的是內建中彰 AQI sample。這是一份小型課堂示範資料，欄位邏輯對齊台灣空氣品質開放資料，但不是即時 API 抓取。Kaggle 是建議用於可重現練習的資料參考；MOENV AQX_P_432 則是正式應用時應改用的官方來源。",
         "download_data": "下載 sample CSV",
         "download_report": "下載 CRISP-DM 報告",
         "source_title": "資料來源評估",
         "source_body": """
+        - 目前 app 實際建模與圖表使用的是內建 `data/central_taiwan_aqi_sample.csv` sample。
         - Kaggle `Taiwan Air Quality Index Data 2016~2024` 適合展示與練習，因為資料已整理成可分析格式。
         - 正式替代來源是環境部 `AQX_P_432`，可取得每小時測站 AQI 與污染物欄位。
         - Kaggle 適合作品展示與可重現分析；環境部 API 更接近正式資料源。
@@ -520,17 +552,51 @@ with st.sidebar:
             st.rerun()
 
 
-def fit_linear_model(feature_df: pd.DataFrame, target: pd.Series):
+MODEL_OPTIONS = {
+    "ols": {"label_key": "model_ols", "reading_key": "model_ols_reading"},
+    "ridge": {"label_key": "model_ridge", "reading_key": "model_ridge_reading"},
+    "lasso": {"label_key": "model_lasso", "reading_key": "model_lasso_reading"},
+    "elasticnet": {"label_key": "model_elasticnet", "reading_key": "model_elasticnet_reading"},
+}
+
+
+def model_label(model_key: str) -> str:
+    return t(MODEL_OPTIONS.get(model_key, MODEL_OPTIONS["ols"])["label_key"])
+
+
+def model_reading(model_key: str) -> str:
+    return t(MODEL_OPTIONS.get(model_key, MODEL_OPTIONS["ols"])["reading_key"])
+
+
+def build_sklearn_model(model_key: str):
+    if model_key == "ridge" and Ridge is not None:
+        return make_pipeline(StandardScaler(), Ridge(alpha=1.0)), model_label("ridge")
+    if model_key == "lasso" and Lasso is not None:
+        return make_pipeline(StandardScaler(), Lasso(alpha=0.03, max_iter=10000)), model_label("lasso")
+    if model_key == "elasticnet" and ElasticNet is not None:
+        return make_pipeline(
+            StandardScaler(),
+            ElasticNet(alpha=0.03, l1_ratio=0.45, max_iter=10000),
+        ), model_label("elasticnet")
+    return LinearRegression(), model_label("ols")
+
+
+def extract_coefficients(model, model_key: str) -> tuple[np.ndarray, float]:
+    if model_key in {"ridge", "lasso", "elasticnet"} and hasattr(model, "named_steps"):
+        estimator = model.named_steps[model_key]
+        return estimator.coef_, float(estimator.intercept_)
+    return model.coef_, float(model.intercept_)
+
+
+def fit_linear_model(feature_df: pd.DataFrame, target: pd.Series, model_key: str = "ols"):
     x = feature_df.to_numpy(dtype=float)
     y = target.to_numpy(dtype=float)
 
     if LinearRegression is not None:
-        model = LinearRegression()
+        model, model_name = build_sklearn_model(model_key)
         model.fit(x, y)
         y_pred = model.predict(x)
-        coefficients = model.coef_
-        intercept = float(model.intercept_)
-        model_name = "scikit-learn LinearRegression"
+        coefficients, intercept = extract_coefficients(model, model_key)
     else:
         x_design = np.column_stack([np.ones(len(x)), x])
         params, *_ = np.linalg.lstsq(x_design, y, rcond=None)
@@ -541,6 +607,7 @@ def fit_linear_model(feature_df: pd.DataFrame, target: pd.Series):
 
     residuals = y - y_pred
     return {
+        "model_key": model_key if LinearRegression is not None else "ols",
         "model_name": model_name,
         "intercept": intercept,
         "coefficients": coefficients,
@@ -672,7 +739,86 @@ def metric_explanation(result: dict) -> None:
     )
 
 
-def report_markdown() -> str:
+def model_profile(result: dict) -> None:
+    note = t("coefficient_note") if result["model_key"] != "ols" else ""
+    st.markdown(
+        f"""
+        <div class="metric-explain">
+            <strong>{t("model_profile_title")}：</strong>{model_reading(result["model_key"])}
+            {f"<br>{note}" if note else ""}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def compare_linear_models(feature_df: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
+    rows = []
+    available_models = ["ols"] if LinearRegression is None else list(MODEL_OPTIONS.keys())
+    for model_key in available_models:
+        result = fit_linear_model(feature_df, target, model_key)
+        rows.append(
+            {
+                t("model"): result["model_name"],
+                t("r2"): round(result["r2"], 3),
+                t("rmse"): round(result["rmse"], 2),
+                t("mae"): round(result["mae"], 2),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def report_markdown(locale: str | None = None) -> str:
+    active_locale = locale or st.session_state.locale
+    if active_locale == "zh":
+        return f"""# CRISP-DM 報告：Linear Regression Practice
+
+## 1. 商業理解
+
+本專案使用台中、彰化空氣品質資料，找出不符合一般污染物規律的觀測。實務目標不是取代官方預報，而是協助非技術使用者更快注意可疑 AQI 讀數。
+
+## 2. 資料理解
+
+目前 app 實際使用資料：內建中彰 AQI sample
+
+內建 sample 說明：這是一份小型課堂示範資料，欄位邏輯對齊台灣空氣品質開放資料，保留測站、縣市、發布時間、AQI、PM2.5、PM10、O3、NO2、CO、SO2 與風速等欄位。它適合示範數值建模流程，但不是即時 API 抓取。
+
+建議可重現資料來源：{DEFAULT_SOURCE_NAME}
+
+Kaggle URL：{DEFAULT_SOURCE_URL}
+
+正式替代來源：{OFFICIAL_SOURCE_NAME}
+
+MOENV URL：{OFFICIAL_SOURCE_URL}
+
+資料來源判斷：Kaggle 適合作品展示與練習，因為資料已整理成可分析格式；MOENV AQX_P_432 更接近正式資料源，適合未來要接近真實應用時改用。
+
+## 3. 資料準備
+
+- 正規化常見 AQI 欄位名稱。
+- 將污染物與氣象欄位轉成數值。
+- 若資料包含縣市欄位，篩選台中與彰化。
+- 移除預測目標與特徵欄位缺值的資料列。
+- 讓使用者在介面中選擇目標欄位與特徵組合。
+
+## 4. 模型建立
+
+本專案仍維持線性回歸作業範圍，但增加多個線性模型變體：
+
+- OLS 普通最小平方法：最清楚的 baseline，適合說明線性關係。
+- Ridge 迴歸：保留所有特徵並降低係數波動，適合污染物欄位彼此相關的情境。
+- Lasso 迴歸：可將較弱特徵壓向 0，適合做特徵篩選。
+- ElasticNet 迴歸：折衷 Ridge 與 Lasso，兼顧穩定性與簡化。
+
+## 5. 模型評估
+
+介面使用 R-squared、RMSE、MAE 與殘差排序。R-squared 用來看模型抓到多少規律；RMSE 與 MAE 用來看平均誤差；絕對殘差最大的資料列，是最值得人工檢查的異常觀測。
+
+## 6. 部署與使用
+
+結果包裝成雙語 Streamlit app，支援明暗色、sample 資料下載、資料來源說明、白話解讀與依目前語言輸出的 CRISP-DM 報告。外部 CSV 上傳在尚未定義 schema 驗證前先移除。
+"""
+
     return f"""# CRISP-DM Report: Linear Regression Practice
 
 ## 1. Business Understanding
@@ -681,15 +827,19 @@ This project uses central Taiwan air-quality data to identify observations that 
 
 ## 2. Data Understanding
 
-Default source: {DEFAULT_SOURCE_NAME}
+Current app data: bundled central Taiwan AQI sample
 
-Default source URL: {DEFAULT_SOURCE_URL}
+Bundled sample note: this is a compact classroom demo dataset with field logic aligned to Taiwan AQI open data. It keeps station, county, publish time, AQI, PM2.5, PM10, O3, NO2, CO, SO2 and wind-speed-like fields. It is useful for demonstrating numeric modeling, but it is not a live API pull.
+
+Recommended reproducible dataset reference: {DEFAULT_SOURCE_NAME}
+
+Kaggle URL: {DEFAULT_SOURCE_URL}
 
 Official replacement source: {OFFICIAL_SOURCE_NAME}
 
-Official source URL: {OFFICIAL_SOURCE_URL}
+MOENV URL: {OFFICIAL_SOURCE_URL}
 
-The bundled sample keeps station, county, publish time, AQI, PM2.5, PM10, O3, NO2, CO, SO2 and wind-speed-like numeric fields. The default scope focuses on Taichung and Changhua.
+Source judgment: Kaggle is suitable for reproducible classroom and portfolio practice because it is already shaped for analysis. MOENV AQX_P_432 is closer to the source of truth and should be used for a future production-like version.
 
 ## 3. Data Preparation
 
@@ -701,7 +851,12 @@ The bundled sample keeps station, county, publish time, AQI, PM2.5, PM10, O3, NO
 
 ## 4. Modeling
 
-The app trains a simple linear regression baseline. It predicts a numeric target, such as AQI, from selected pollutant fields.
+The app stays within the linear-regression assignment scope but adds multiple linear model variants:
+
+- OLS Linear Regression: the clearest baseline for explaining a linear relationship.
+- Ridge Regression: keeps all features while reducing coefficient instability, useful when pollutant fields are correlated.
+- Lasso Regression: can shrink weaker feature effects toward zero, useful for feature screening.
+- ElasticNet Regression: balances Ridge and Lasso for a practical stability/simplification compromise.
 
 ## 5. Evaluation
 
@@ -709,18 +864,20 @@ The app reports R-squared, RMSE and MAE. It also ranks observations by absolute 
 
 ## 6. Deployment
 
-The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, source notes and plain-language explanations below the chart. External upload is intentionally removed until a schema validator is defined.
+The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, source notes, plain-language explanations below the chart and a CRISP-DM report generated in the currently selected language. External upload is intentionally removed until a schema validator is defined.
 """
 
 
 def source_download_panel(panel_id: str) -> None:
     sample_bytes = SAMPLE_AQI_PATH.read_bytes()
-    report_text = CRISP_REPORT_PATH.read_text(encoding="utf-8") if CRISP_REPORT_PATH.exists() else report_markdown()
+    report_text = report_markdown(st.session_state.locale)
+    report_file_name = f"crisp_dm_report_{st.session_state.locale}.md"
 
     st.markdown(
         f"""
         <div class="source-card">
             <h4>{t("source_panel_title")}</h4>
+            <p><strong>{t("source_run")}:</strong> {t("bundled_sample")}</p>
             <p>{t("source_panel_body")}</p>
             <p><strong>{DEFAULT_SOURCE_NAME}</strong><br>
             <a href="{DEFAULT_SOURCE_URL}" target="_blank">{DEFAULT_SOURCE_URL}</a></p>
@@ -744,7 +901,7 @@ def source_download_panel(panel_id: str) -> None:
         st.download_button(
             t("download_report"),
             data=report_text.encode("utf-8"),
-            file_name="crisp_dm_report.md",
+            file_name=report_file_name,
             mime="text/markdown",
             use_container_width=True,
             key=f"download_report_{panel_id}",
@@ -891,13 +1048,20 @@ def aqi_case() -> None:
     if not selected_features:
         st.warning(t("select_feature"))
         return
+    available_models = ["ols"] if LinearRegression is None else list(MODEL_OPTIONS.keys())
+    model_key = st.selectbox(
+        t("model_choice"),
+        available_models,
+        format_func=model_label,
+        key="aqi_model_choice",
+    )
 
     model_df = df[[target_col, *selected_features]].dropna().copy()
     if len(model_df) < 10:
         st.warning(t("too_few_rows"))
         return
 
-    result = fit_linear_model(model_df[selected_features], model_df[target_col])
+    result = fit_linear_model(model_df[selected_features], model_df[target_col], model_key)
     model_df["predicted"] = result["predictions"]
     model_df["residual"] = result["residuals"]
     model_df["abs_residual"] = np.abs(result["residuals"])
@@ -910,6 +1074,9 @@ def aqi_case() -> None:
     st.caption(f"{t('source_run')}: {source_label}. {t('complete_rows')}: {len(model_df)}.")
     show_metrics(result)
     metric_explanation(result)
+    model_profile(result)
+    st.markdown(f"#### {t('model_comparison')}")
+    st.dataframe(compare_linear_models(model_df[selected_features], model_df[target_col]), use_container_width=True, hide_index=True)
 
     coefficient_df = pd.DataFrame(
         {"feature": selected_features, "coefficient": result["coefficients"]}
@@ -941,6 +1108,8 @@ def aqi_case() -> None:
         st.plotly_chart(fig, use_container_width=True, config=plot_config)
     with right:
         st.markdown(f"#### {t('coefficients')}")
+        if result["model_key"] != "ols":
+            st.caption(t("coefficient_note"))
         st.dataframe(coefficient_df, use_container_width=True, hide_index=True)
 
     plain_aqi_reading(model_df, target_col)
