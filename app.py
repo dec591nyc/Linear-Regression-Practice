@@ -21,8 +21,8 @@ CENTRAL_COUNTIES = ["臺中市", "台中市", "彰化縣"]
 
 TEXT = {
     "en": {
-        "page_title": "Central Taiwan AQI Regression Lab",
-        "hero_title": "Central Taiwan AQI Regression Lab",
+        "page_title": "Linear Regression Practice",
+        "hero_title": "Linear Regression Practice",
         "hero_subtitle": "A compact regression dashboard for testing baseline modeling, residual ranking, and central Taiwan air-quality use cases.",
         "theme": "Theme",
         "language": "Language",
@@ -54,6 +54,7 @@ TEXT = {
         "advanced_data": "Advanced data source",
         "use_external": "Use uploaded AQI CSV",
         "upload_label": "Upload Kaggle or MOENV AQI CSV",
+        "upload_help": "Optional. If no file is uploaded, the app uses the bundled central Taiwan AQI sample.",
         "target": "Target variable",
         "features": "Feature variables",
         "source_run": "Data source in this run",
@@ -73,10 +74,16 @@ TEXT = {
         "too_few_cols": "AQI data needs at least two numeric columns after cleaning.",
         "select_feature": "Select at least one feature variable.",
         "too_few_rows": "The selected columns have too few complete rows for a useful regression.",
+        "metric_status_title": "Metric status",
+        "metric_r2_strong": "R-squared is strong. The model explains most of the target variation in this run.",
+        "metric_r2_ok": "R-squared is moderate. The model captures part of the pattern, but residual checks still matter.",
+        "metric_r2_weak": "R-squared is weak. Treat this as a baseline model, not a reliable predictor.",
+        "metric_error_note": "RMSE and MAE are average error indicators. Lower values mean the prediction is closer to the actual target.",
+        "metric_outlier_note": "Rows with the largest absolute residuals are the observations most worth checking manually.",
     },
     "zh": {
-        "page_title": "中彰空氣品質迴歸分析",
-        "hero_title": "中彰空氣品質迴歸分析",
+        "page_title": "線性迴歸實作",
+        "hero_title": "線性迴歸實作",
         "hero_subtitle": "以台中、彰化空氣品質為情境，展示基礎迴歸建模、殘差排序與異常觀測判讀。",
         "theme": "主題",
         "language": "語言",
@@ -108,6 +115,7 @@ TEXT = {
         "advanced_data": "進階資料來源",
         "use_external": "使用外部 AQI CSV",
         "upload_label": "上傳 Kaggle 或環境部 AQI CSV",
+        "upload_help": "選填。未上傳時會使用內建中彰 AQI sample。",
         "target": "預測目標",
         "features": "特徵欄位",
         "source_run": "本次資料來源",
@@ -127,12 +135,18 @@ TEXT = {
         "too_few_cols": "清理後的 AQI 資料至少需要兩個數值欄位。",
         "select_feature": "請至少選擇一個特徵欄位。",
         "too_few_rows": "所選欄位的完整資料筆數太少，不適合建立迴歸模型。",
+        "metric_status_title": "指標狀況",
+        "metric_r2_strong": "R-squared 表現佳，代表本次模型能解釋多數目標變化。",
+        "metric_r2_ok": "R-squared 表現中等，模型抓到部分規律，但仍需要看殘差。",
+        "metric_r2_weak": "R-squared 偏弱，這次結果適合視為 baseline，不宜當作可靠預測模型。",
+        "metric_error_note": "RMSE 與 MAE 是平均誤差指標，數值越低代表預測越接近實際目標。",
+        "metric_outlier_note": "絕對殘差最大的資料列，就是最值得人工檢查的異常觀測。",
     },
 }
 
 
 st.set_page_config(
-    page_title="Central Taiwan AQI Regression Lab",
+    page_title="Linear Regression Practice",
     page_icon="AQI",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -165,13 +179,16 @@ with st.sidebar:
 
 THEMES = {
     "light": {
-        "bg": "#f7f8fb",
+        "bg": "#f4f6fa",
         "panel": "#ffffff",
-        "text": "#172033",
-        "muted": "#64748b",
-        "border": "#d7dde8",
-        "accent": "#2563eb",
-        "note_bg": "#eef4ff",
+        "text": "#111827",
+        "muted": "#4b5563",
+        "border": "#cfd8e3",
+        "accent": "#0f766e",
+        "note_bg": "#ecfdf5",
+        "metric_bg": "#ffffff",
+        "metric_value": "#0f172a",
+        "plot_bg": "#ffffff",
     },
     "dark": {
         "bg": "#0f172a",
@@ -181,9 +198,13 @@ THEMES = {
         "border": "#2f3b52",
         "accent": "#38bdf8",
         "note_bg": "#14243a",
+        "metric_bg": "#182235",
+        "metric_value": "#f8fafc",
+        "plot_bg": "#111827",
     },
 }
 theme = THEMES[st.session_state.theme]
+plot_template = "plotly_dark" if st.session_state.theme == "dark" else "plotly_white"
 
 st.markdown(
     f"""
@@ -199,7 +220,8 @@ st.markdown(
     }}
     .block-container {{
         max-width: 1180px;
-        padding-top: 2rem;
+        padding-top: 1.35rem;
+        padding-bottom: 2.25rem;
     }}
     [data-testid="stHeader"] {{
         background: transparent;
@@ -208,19 +230,50 @@ st.markdown(
         background: {theme["panel"]};
         border-right: 1px solid {theme["border"]};
     }}
+    [data-testid="stMetric"] {{
+        background: {theme["metric_bg"]};
+        border: 1px solid {theme["border"]};
+        border-radius: 8px;
+        padding: 0.85rem 0.95rem;
+        min-height: 96px;
+    }}
+    [data-testid="stMetricLabel"] {{
+        color: {theme["muted"]} !important;
+        font-size: 0.82rem !important;
+    }}
+    [data-testid="stMetricValue"] {{
+        color: {theme["metric_value"]} !important;
+        font-size: 1.35rem !important;
+        line-height: 1.25 !important;
+    }}
     [data-testid="stMetric"], [data-testid="stDataFrame"], .stTabs [data-baseweb="tab-list"] {{
         color: {theme["text"]};
     }}
+    h2 {{
+        font-size: 1.28rem !important;
+        line-height: 1.35 !important;
+    }}
+    h3 {{
+        font-size: 1.08rem !important;
+        line-height: 1.35 !important;
+    }}
+    p, li, label, .stMarkdown, [data-testid="stCaptionContainer"] {{
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }}
     .main-title {{
-        font-size: 2.25rem;
+        font-size: 1.85rem;
+        line-height: 1.2;
         font-weight: 750;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.45rem;
         color: {theme["text"]};
     }}
     .subtitle {{
         color: {theme["muted"]};
-        margin-bottom: 1.4rem;
-        line-height: 1.7;
+        margin-bottom: 1.15rem;
+        line-height: 1.6;
+        font-size: 0.98rem;
+        max-width: 820px;
     }}
     .note {{
         border-left: 4px solid {theme["accent"]};
@@ -228,6 +281,21 @@ st.markdown(
         padding: 0.8rem 1rem;
         margin: 0.8rem 0 1.2rem;
         color: {theme["text"]};
+        font-size: 0.94rem;
+        line-height: 1.65;
+    }}
+    .metric-explain {{
+        background: {theme["panel"]};
+        border: 1px solid {theme["border"]};
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        margin: 0.85rem 0 1.1rem;
+        color: {theme["text"]};
+        font-size: 0.93rem;
+        line-height: 1.65;
+    }}
+    .metric-explain strong {{
+        color: {theme["accent"]};
     }}
     </style>
     """,
@@ -328,6 +396,26 @@ def show_metrics(result: dict) -> None:
     cols[3].metric(t("model"), result["model_name"])
 
 
+def metric_explanation(result: dict) -> None:
+    if result["r2"] >= 0.8:
+        r2_text = t("metric_r2_strong")
+    elif result["r2"] >= 0.5:
+        r2_text = t("metric_r2_ok")
+    else:
+        r2_text = t("metric_r2_weak")
+
+    st.markdown(
+        f"""
+        <div class="metric-explain">
+            <strong>{t("metric_status_title")}：</strong>{r2_text}<br>
+            {t("metric_error_note")}<br>
+            {t("metric_outlier_note")}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def synthetic_lab() -> None:
     st.subheader(t("synthetic_title"))
     st.markdown(
@@ -357,6 +445,7 @@ def synthetic_lab() -> None:
     df["is_outlier"] = df["rank"] <= 10
 
     show_metrics(result)
+    metric_explanation(result)
 
     st.markdown(
         f"{t('equation')}: `y = {result['coefficients'][0]:.4f} * x + {result['intercept']:.4f}`"
@@ -379,7 +468,16 @@ def synthetic_lab() -> None:
     )
     fig.add_trace(go.Scatter(x=x_line, y=true_line, mode="lines", name=t("true_line"), line={"dash": "dash"}))
     fig.add_trace(go.Scatter(x=x_line, y=fitted_line, mode="lines", name=t("regression_line")))
-    fig.update_layout(height=520, xaxis_title="x", yaxis_title="y", legend_orientation="h")
+    fig.update_layout(
+        height=500,
+        xaxis_title="x",
+        yaxis_title="y",
+        legend_orientation="h",
+        template=plot_template,
+        paper_bgcolor=theme["plot_bg"],
+        plot_bgcolor=theme["plot_bg"],
+        font={"color": theme["text"], "size": 13},
+    )
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown(f"#### {t('outliers')}")
@@ -399,9 +497,7 @@ def aqi_case() -> None:
 
     uploaded = None
     with st.sidebar.expander(t("advanced_data"), expanded=False):
-        use_external = st.checkbox(t("use_external"), value=False)
-        if use_external:
-            uploaded = st.file_uploader(t("upload_label"), type=["csv"])
+        uploaded = st.file_uploader(t("upload_label"), type=["csv"], help=t("upload_help"))
 
     if uploaded is not None:
         raw_df = pd.read_csv(uploaded)
@@ -453,6 +549,7 @@ def aqi_case() -> None:
 
     st.caption(f"{t('source_run')}: {source_label}. {t('complete_rows')}: {len(model_df)}.")
     show_metrics(result)
+    metric_explanation(result)
 
     coefficient_df = pd.DataFrame(
         {"feature": selected_features, "coefficient": result["coefficients"]}
@@ -480,7 +577,13 @@ def aqi_case() -> None:
                 line={"dash": "dash", "color": "#475569"},
             )
         )
-        fig.update_layout(height=460)
+        fig.update_layout(
+            height=440,
+            template=plot_template,
+            paper_bgcolor=theme["plot_bg"],
+            plot_bgcolor=theme["plot_bg"],
+            font={"color": theme["text"], "size": 13},
+        )
         st.plotly_chart(fig, use_container_width=True)
     with right:
         st.markdown(f"#### {t('coefficients')}")

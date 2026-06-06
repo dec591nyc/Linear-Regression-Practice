@@ -1,6 +1,6 @@
-# 中彰空氣品質迴歸分析
+# Linear Regression Practice
 
-本專案是一個以台中、彰化空氣品質為情境的資料分析展示工具，核心目標是用 `Python` 與 `Streamlit` 建立可互動的迴歸分析介面，觀察模型預測、殘差分布與異常觀測。
+本專案是一個線性迴歸分析展示工具，核心目標是用 `Python` 與 `Streamlit` 建立可互動的模型介面，觀察模型預測、殘差分布與異常觀測。實際案例以台中、彰化空氣品質資料作為延伸情境。
 
 專案保留一個可調參數的迴歸模擬器，用來確認模型、殘差與離群值排序的基礎流程；主要案例則放在中彰 AQI / PM2.5 等數值資料，讓分析結果可以對應到空污觀測、戶外活動安排與營運風險提醒等實際需求。
 
@@ -12,7 +12,7 @@ Live Demo：部署後補上 Streamlit Community Cloud 連結。
 
 | 面向 | 內容 |
 | --- | --- |
-| 專案定位 | 中彰空氣品質迴歸分析與異常觀測偵測 |
+| 專案定位 | 線性迴歸實作、模型指標解讀與異常觀測偵測 |
 | 基礎模組 | 以 `y = ax + b + noise` 產生資料，訓練線性迴歸模型並找出前 10 個殘差離群點 |
 | 實際案例 | 以台中、彰化 AQI / PM2.5 數值資料進行污染指標預測與異常觀測排序 |
 | 資料來源 | Kaggle Taiwan AQI 整理資料；正式替代來源為環境部 `AQX_P_432` API |
@@ -82,7 +82,7 @@ http://localhost:8501
 ## 目錄結構
 
 ```text
-central-taiwan-aqi-regression/
+Linear-Regression-Practice/
 ├── app.py
 ├── requirements.txt
 ├── README.md
@@ -92,7 +92,7 @@ central-taiwan-aqi-regression/
     └── data_source_evaluation.md
 ```
 
-`data/central_taiwan_aqi_sample.csv` 用於本機展示欄位格式與互動流程。正式作業展示時，可改以上傳 Kaggle AQI CSV 或環境部 API 匯出的 CSV。
+`data/central_taiwan_aqi_sample.csv` 用於本機展示欄位格式與互動流程。進階資料來源模式可改以上傳 Kaggle AQI CSV 或環境部 API 匯出的 CSV。
 
 ---
 
