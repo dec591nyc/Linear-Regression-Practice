@@ -197,10 +197,10 @@ st.markdown(
         background: {theme["bg"]};
         color: {theme["text"]};
     }}
-    .block-container {
+    .block-container {{
         max-width: 1180px;
         padding-top: 2rem;
-    }
+    }}
     [data-testid="stHeader"] {{
         background: transparent;
     }}
@@ -211,24 +211,24 @@ st.markdown(
     [data-testid="stMetric"], [data-testid="stDataFrame"], .stTabs [data-baseweb="tab-list"] {{
         color: {theme["text"]};
     }}
-    .main-title {
+    .main-title {{
         font-size: 2.25rem;
         font-weight: 750;
         margin-bottom: 0.35rem;
         color: {theme["text"]};
-    }
-    .subtitle {
+    }}
+    .subtitle {{
         color: {theme["muted"]};
         margin-bottom: 1.4rem;
         line-height: 1.7;
-    }
-    .note {
+    }}
+    .note {{
         border-left: 4px solid {theme["accent"]};
         background: {theme["note_bg"]};
         padding: 0.8rem 1rem;
         margin: 0.8rem 0 1.2rem;
         color: {theme["text"]};
-    }
+    }}
     </style>
     """,
     unsafe_allow_html=True,
