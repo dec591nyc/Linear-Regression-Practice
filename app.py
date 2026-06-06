@@ -80,6 +80,10 @@ TEXT = {
         "metric_r2_weak": "R-squared is weak. Treat this as a baseline model, not a reliable predictor.",
         "metric_error_note": "RMSE and MAE are average error indicators. Lower values mean the prediction is closer to the actual target.",
         "metric_outlier_note": "Rows with the largest absolute residuals are the observations most worth checking manually.",
+        "chart_plain_title": "Plain-language reading",
+        "chart_plain_aqi": "Each dot is one air-quality record. The horizontal position is what the model guessed, and the vertical position is the real value. Dots close to the diagonal line mean the model guessed well. Dots far from the line are records worth checking because the pollutant pattern looked unusual.",
+        "chart_plain_stats": "In this run, the average {target} is {avg:.1f}. The largest miss is about {residual:.1f}. This does not automatically mean the air is dangerous; it means the reading does not match the simple pattern learned from the selected pollutants.",
+        "chart_plain_caution": "Because this is a small baseline demo, use it to understand patterns and suspicious records, not as an official air-quality forecast.",
     },
     "zh": {
         "page_title": "線性迴歸實作",
@@ -141,6 +145,10 @@ TEXT = {
         "metric_r2_weak": "R-squared 偏弱，這次結果適合視為 baseline，不宜當作可靠預測模型。",
         "metric_error_note": "RMSE 與 MAE 是平均誤差指標，數值越低代表預測越接近實際目標。",
         "metric_outlier_note": "絕對殘差最大的資料列，就是最值得人工檢查的異常觀測。",
+        "chart_plain_title": "白話解讀",
+        "chart_plain_aqi": "每一個點代表一筆空氣品質觀測。橫軸是模型猜出的數值，縱軸是真實數值。點越靠近斜線，代表模型猜得越準；離斜線越遠，代表這筆資料和一般污染物規律不太一樣，值得再檢查。",
+        "chart_plain_stats": "本次資料的平均 {target} 約為 {avg:.1f}，最大誤差約為 {residual:.1f}。這不一定代表空氣很危險，而是代表這筆觀測不太符合目前模型學到的簡單規律。",
+        "chart_plain_caution": "因為這是小型 baseline demo，適合用來理解污染趨勢與可疑觀測，不適合作為正式空氣品質預報。",
     },
 }
 
@@ -189,6 +197,9 @@ THEMES = {
         "metric_bg": "#ffffff",
         "metric_value": "#0f172a",
         "plot_bg": "#ffffff",
+        "control_bg": "#ffffff",
+        "control_text": "#111827",
+        "control_muted": "#6b7280",
     },
     "dark": {
         "bg": "#0f172a",
@@ -201,6 +212,9 @@ THEMES = {
         "metric_bg": "#182235",
         "metric_value": "#f8fafc",
         "plot_bg": "#111827",
+        "control_bg": "#111827",
+        "control_text": "#f8fafc",
+        "control_muted": "#a8b3c7",
     },
 }
 theme = THEMES[st.session_state.theme]
@@ -218,6 +232,10 @@ st.markdown(
         background: {theme["bg"]};
         color: {theme["text"]};
     }}
+    [data-testid="stAppViewContainer"] *,
+    [data-testid="stSidebar"] * {{
+        color: {theme["text"]};
+    }}
     .block-container {{
         max-width: 1180px;
         padding-top: 1.35rem;
@@ -229,6 +247,67 @@ st.markdown(
     [data-testid="stSidebar"] {{
         background: {theme["panel"]};
         border-right: 1px solid {theme["border"]};
+    }}
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] div,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+    [data-testid="stAppViewContainer"] label,
+    [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"],
+    [data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"] {{
+        color: {theme["text"]} !important;
+    }}
+    [data-testid="stSidebar"] small,
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"],
+    [data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] {{
+        color: {theme["muted"]} !important;
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        color: {theme["muted"]} !important;
+        font-size: 0.94rem !important;
+    }}
+    .stTabs [data-baseweb="tab"][aria-selected="true"],
+    .stTabs [data-baseweb="tab"][aria-selected="true"] * {{
+        color: {theme["accent"]} !important;
+    }}
+    [data-baseweb="select"] > div,
+    [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div,
+    [data-testid="stNumberInput"] input {{
+        background: {theme["control_bg"]} !important;
+        color: {theme["control_text"]} !important;
+        border-color: {theme["border"]} !important;
+    }}
+    [data-baseweb="select"] span,
+    [data-baseweb="select"] svg,
+    [data-baseweb="input"] input,
+    [data-testid="stNumberInput"] input {{
+        color: {theme["control_text"]} !important;
+        fill: {theme["control_text"]} !important;
+    }}
+    [data-baseweb="tag"] {{
+        background: #ef6359 !important;
+        color: #ffffff !important;
+    }}
+    [data-baseweb="tag"] span,
+    [data-baseweb="tag"] svg {{
+        color: #ffffff !important;
+        fill: #ffffff !important;
+    }}
+    [data-testid="stFileUploaderDropzone"] {{
+        background: {theme["control_bg"]} !important;
+        border: 1px solid {theme["border"]} !important;
+        border-radius: 8px !important;
+    }}
+    [data-testid="stFileUploaderDropzone"] * {{
+        color: {theme["control_text"]} !important;
+    }}
+    [data-testid="stFileUploaderDropzone"] small {{
+        color: {theme["control_muted"]} !important;
+    }}
+    button {{
+        color: {theme["control_text"]} !important;
     }}
     [data-testid="stMetric"] {{
         background: {theme["metric_bg"]};
@@ -296,6 +375,26 @@ st.markdown(
     }}
     .metric-explain strong {{
         color: {theme["accent"]};
+    }}
+    .plain-reading {{
+        background: {theme["panel"]};
+        border: 1px solid {theme["border"]};
+        border-left: 4px solid {theme["accent"]};
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        margin: 1rem 0 1.25rem;
+        color: {theme["text"]};
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }}
+    .plain-reading h4 {{
+        margin: 0 0 0.45rem 0;
+        font-size: 1.02rem;
+        color: {theme["text"]};
+    }}
+    .plain-reading p {{
+        margin: 0.35rem 0;
+        color: {theme["text"]};
     }}
     </style>
     """,
@@ -410,6 +509,22 @@ def metric_explanation(result: dict) -> None:
             <strong>{t("metric_status_title")}：</strong>{r2_text}<br>
             {t("metric_error_note")}<br>
             {t("metric_outlier_note")}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def plain_aqi_reading(model_df: pd.DataFrame, target_col: str) -> None:
+    avg_target = float(model_df[target_col].mean())
+    max_residual = float(model_df["abs_residual"].max())
+    st.markdown(
+        f"""
+        <div class="plain-reading">
+            <h4>{t("chart_plain_title")}</h4>
+            <p>{t("chart_plain_aqi")}</p>
+            <p>{t("chart_plain_stats").format(target=target_col, avg=avg_target, residual=max_residual)}</p>
+            <p>{t("chart_plain_caution")}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -588,6 +703,8 @@ def aqi_case() -> None:
     with right:
         st.markdown(f"#### {t('coefficients')}")
         st.dataframe(coefficient_df, use_container_width=True, hide_index=True)
+
+    plain_aqi_reading(model_df, target_col)
 
     st.markdown(f"#### {t('top_outliers')}")
     preferred_cols = [
