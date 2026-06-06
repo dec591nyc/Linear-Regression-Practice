@@ -37,6 +37,7 @@ TEXT = {
         "hero_subtitle": "A compact regression dashboard for testing baseline modeling, residual ranking, and central Taiwan air-quality use cases.",
         "theme": "Theme",
         "language": "Language",
+        "sidebar_toggle": "Toggle sidebar",
         "to_zh": "🌐 繁",
         "to_en": "🌐 EN",
         "light": "Light",
@@ -127,6 +128,7 @@ TEXT = {
         "hero_subtitle": "以台中、彰化空氣品質為情境，展示基礎迴歸建模、殘差排序與異常觀測判讀。",
         "theme": "主題",
         "language": "語言",
+        "sidebar_toggle": "切換側邊欄",
         "to_zh": "🌐 繁",
         "to_en": "🌐 EN",
         "light": "淺色",
@@ -225,6 +227,8 @@ if "theme" not in st.session_state:
     st.session_state.theme = "light"
 if "locale" not in st.session_state:
     st.session_state.locale = "zh"
+if "sidebar_collapsed" not in st.session_state:
+    st.session_state.sidebar_collapsed = False
 
 t = TEXT[st.session_state.locale].get
 
@@ -271,6 +275,20 @@ THEMES = {
 theme = THEMES[st.session_state.theme]
 plot_template = "plotly_dark" if st.session_state.theme == "dark" else "plotly_white"
 plot_config = {"displayModeBar": False, "responsive": True}
+sidebar_visibility_css = ""
+if st.session_state.sidebar_collapsed:
+    sidebar_visibility_css = """
+    [data-testid="stSidebar"],
+    section[data-testid="stSidebar"] {
+        display: none !important;
+        width: 0 !important;
+        min-width: 0 !important;
+    }
+    [data-testid="stMain"],
+    [data-testid="stMainBlockContainer"] {
+        margin-left: 0 !important;
+    }
+    """
 
 st.markdown(
     f"""
@@ -280,9 +298,19 @@ st.markdown(
         visibility: hidden !important;
         height: 0 !important;
     }}
-    html, body, [data-testid="stAppViewContainer"] {{
-        background: {theme["bg"]};
-        color: {theme["text"]};
+    [data-testid="stSidebarCollapseButton"] {{
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }}
+    html,
+    body,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stAppViewBlockContainer"],
+    [data-testid="stMain"],
+    [data-testid="stMainBlockContainer"] {{
+        background: {theme["bg"]} !important;
+        color: {theme["text"]} !important;
     }}
     [data-testid="stApp"], .stApp {{
         background: {theme["bg"]} !important;
@@ -294,38 +322,66 @@ st.markdown(
     }}
     .block-container {{
         max-width: 1180px;
-        padding-top: 1.35rem;
+        padding-top: 1.75rem;
         padding-bottom: 2.25rem;
     }}
-    [data-testid="stHeader"] {{
-        background: {theme["bg"]} !important;
+    [data-testid="stHeader"],
+    .stAppHeader {{
+        background: transparent !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        pointer-events: none !important;
     }}
     [data-testid="stHeader"] * {{
         color: {theme["text"]} !important;
     }}
     [data-testid="stToolbar"],
-    [data-testid="stToolbar"] *,
-    [data-testid="collapsedControl"],
-    [data-testid="collapsedControl"] *,
-    [data-testid="stSidebarCollapseButton"],
-    [data-testid="stSidebarCollapseButton"] *,
-    [data-testid="stSidebarCollapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] * {{
+    [data-testid="stToolbar"] * {{
         visibility: visible !important;
         opacity: 1 !important;
         pointer-events: auto !important;
         color: {theme["text"]} !important;
         fill: {theme["text"]} !important;
     }}
-    [data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] {{
-        display: flex !important;
-        z-index: 1000 !important;
+    [data-testid="stToolbar"] {{
+        top: 0.55rem !important;
+        right: 0.75rem !important;
+        pointer-events: auto !important;
+    }}
+    [class*="st-key-sidebar_state_toggle"] {{
+        position: fixed !important;
+        top: 12px !important;
+        left: 12px !important;
+        width: 36px !important;
+        height: 36px !important;
+        z-index: 2147483647 !important;
+    }}
+    [class*="st-key-sidebar_state_toggle"] button {{
+        width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 0 !important;
+        border-radius: 8px !important;
+        border: 1px solid {theme["border"]} !important;
+        background: {theme["control_bg"]} !important;
+        color: {theme["control_text"]} !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
     }}
     [data-testid="stSidebar"],
     section[data-testid="stSidebar"] {{
-        background: {theme["panel"]};
-        border-right: 1px solid {theme["border"]};
+        background: {theme["panel"]} !important;
+        border-right: 1px solid {theme["border"]} !important;
+    }}
+    [data-testid="column"],
+    [data-testid="stColumn"],
+    [data-testid="stHorizontalBlock"],
+    [data-testid="stVerticalBlock"],
+    [data-testid="stElementContainer"] {{
+        background: transparent !important;
+        color: {theme["text"]} !important;
     }}
     [data-testid="stSidebar"] label,
     [data-testid="stSidebar"] p,
@@ -548,6 +604,7 @@ st.markdown(
         fill: {theme["plot_muted"]} !important;
         opacity: 1 !important;
     }}
+    {sidebar_visibility_css}
     </style>
     """,
     unsafe_allow_html=True,
@@ -555,18 +612,25 @@ st.markdown(
 
 t = TEXT[st.session_state.locale].get
 
-with st.sidebar:
-    col_lang, col_theme = st.columns(2)
-    with col_lang:
-        lang_label = t("to_en") if st.session_state.locale == "zh" else t("to_zh")
-        if st.button(lang_label, use_container_width=True, key="lang_toggle", help=t("language")):
-            st.session_state.locale = "en" if st.session_state.locale == "zh" else "zh"
-            st.rerun()
-    with col_theme:
-        theme_label = t("theme_dark_btn") if st.session_state.theme == "light" else t("theme_light_btn")
-        if st.button(theme_label, use_container_width=True, key="theme_toggle", help=t("theme")):
-            st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
-            st.rerun()
+
+sidebar_toggle_label = "☰" if st.session_state.sidebar_collapsed else "‹"
+if st.button(sidebar_toggle_label, key="sidebar_state_toggle", help=t("sidebar_toggle")):
+    st.session_state.sidebar_collapsed = not st.session_state.sidebar_collapsed
+    st.rerun()
+
+if not st.session_state.sidebar_collapsed:
+    with st.sidebar:
+        col_lang, col_theme = st.columns(2)
+        with col_lang:
+            lang_label = t("to_en") if st.session_state.locale == "zh" else t("to_zh")
+            if st.button(lang_label, use_container_width=True, key="lang_toggle", help=t("language")):
+                st.session_state.locale = "en" if st.session_state.locale == "zh" else "zh"
+                st.rerun()
+        with col_theme:
+            theme_label = t("theme_dark_btn") if st.session_state.theme == "light" else t("theme_light_btn")
+            if st.button(theme_label, use_container_width=True, key="theme_toggle", help=t("theme")):
+                st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
+                st.rerun()
 
 
 MODEL_OPTIONS = {
@@ -972,13 +1036,20 @@ def synthetic_lab() -> None:
         unsafe_allow_html=True,
     )
 
-    with st.sidebar:
-        st.markdown(f"### {t('synthetic_params')}")
-        n = st.slider(t("sample_size"), 50, 1000, 300, 50)
-        a = st.slider(t("slope"), -50.0, 50.0, 8.0, 0.5)
-        b = st.slider(t("intercept"), -100.0, 100.0, 40.0, 1.0)
-        var = st.number_input(t("variance"), 0.0, 100000.0, 10000.0, 500.0)
-        seed = st.number_input(t("seed"), 0, 999999, 42, 1)
+    if not st.session_state.sidebar_collapsed:
+        with st.sidebar:
+            st.markdown(f"### {t('synthetic_params')}")
+            n = st.slider(t("sample_size"), 50, 1000, 300, 50, key="synthetic_n")
+            a = st.slider(t("slope"), -50.0, 50.0, 8.0, 0.5, key="synthetic_a")
+            b = st.slider(t("intercept"), -100.0, 100.0, 40.0, 1.0, key="synthetic_b")
+            var = st.number_input(t("variance"), 0.0, 100000.0, 10000.0, 500.0, key="synthetic_var")
+            seed = st.number_input(t("seed"), 0, 999999, 42, 1, key="synthetic_seed")
+    else:
+        n = st.session_state.get("synthetic_n", 300)
+        a = st.session_state.get("synthetic_a", 8.0)
+        b = st.session_state.get("synthetic_b", 40.0)
+        var = st.session_state.get("synthetic_var", 10000.0)
+        seed = st.session_state.get("synthetic_seed", 42)
 
     rng = np.random.default_rng(seed)
     x = rng.uniform(-100, 100, n)
