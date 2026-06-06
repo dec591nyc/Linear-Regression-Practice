@@ -2,7 +2,7 @@
 
 ## Recommended classroom source
 
-Kaggle `Taiwan Air Quality Index Data 2016~2024` is the preferred classroom source for the real-case extension because it already packages Taiwan AQI records for machine-learning practice. The dataset theme also maps naturally to Taichung and Changhua through station or county fields.
+Kaggle `Taiwan Air Quality Index Data 2016~2024` is the preferred reproducible source for the air-quality case because it already packages Taiwan AQI records for machine-learning practice. The dataset theme also maps naturally to Taichung and Changhua through station or county fields.
 
 ## Official replacement source
 
@@ -16,6 +16,6 @@ The official replacement source is Ministry of Environment `AQX_P_432`, the hour
 - Residual ranking can identify unusual observations that the model cannot explain well.
 - Taichung and Changhua are directly meaningful as location filters, not only as a loose background story.
 
-## Boundary with homework requirements
+## Design boundary
 
-The AQI case is a supplement. It should not replace the synthetic `n/a/b/var` workflow, because the homework examples indicate that data generation and outlier detection are part of the core requirement.
+The AQI case and the synthetic `n/a/b/var` sandbox are intentionally separated. The sandbox keeps the baseline regression workflow clear, while the AQI case gives the project a more practical operating context.
