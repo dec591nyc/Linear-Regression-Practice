@@ -7,3 +7,5 @@ output/
 linear_regression_results.csv
 top_10_outliers.csv
 *.png
+docs/
+!assets/project_infography.png
