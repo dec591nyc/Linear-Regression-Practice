@@ -31,17 +31,16 @@ TEXT = {
         "hero_subtitle": "A compact regression dashboard for testing baseline modeling, residual ranking, and central Taiwan air-quality use cases.",
         "theme": "Theme",
         "language": "Language",
-        "to_zh": "繁體中文",
-        "to_en": "English",
+        "to_zh": "🌐 繁",
+        "to_en": "🌐 EN",
         "light": "Light",
         "dark": "Dark",
-        "theme_light_btn": "Light",
-        "theme_dark_btn": "Dark",
+        "theme_light_btn": "☀️",
+        "theme_dark_btn": "🌙",
         "regression_tab": "Regression Sandbox",
         "aqi_tab": "Central Taiwan AQI",
         "crisp_tab": "CRISP-DM Report",
         "source_tab": "Source Evaluation",
-        "sidebar_title": "Project Controls",
         "synthetic_title": "Regression Sandbox",
         "synthetic_note": "This sandbox keeps the required numeric regression workflow: generate data with n, a, b, and variance, fit a line, then rank the top residual outliers.",
         "synthetic_params": "Synthetic Parameters",
@@ -62,16 +61,11 @@ TEXT = {
         "top_outliers": "Top residual observations",
         "aqi_title": "Central Taiwan AQI Case",
         "aqi_note": "This case uses Taichung and Changhua air-quality readings to predict a numeric target and surface observations that the baseline model cannot explain well.",
-        "advanced_data": "Advanced data source",
-        "use_external": "Use uploaded AQI CSV",
-        "upload_label": "Upload Kaggle or MOENV AQI CSV",
-        "upload_help": "Optional. If no file is uploaded, the app uses the bundled central Taiwan AQI sample.",
         "target": "Target variable",
         "features": "Feature variables",
         "source_run": "Data source in this run",
         "complete_rows": "Complete rows used",
         "bundled_sample": "Bundled central Taiwan sample",
-        "uploaded_csv": "Uploaded CSV",
         "coefficients": "Coefficients",
         "actual_predicted": "Actual vs Predicted",
         "perfect_prediction": "Perfect prediction",
@@ -106,7 +100,7 @@ TEXT = {
         "crisp_prep": "Data preparation: normalize column names, keep numeric fields, remove incomplete rows, and let users choose the prediction target and features.",
         "crisp_model": "Modeling: train a simple linear regression baseline and produce predicted values.",
         "crisp_eval": "Evaluation: use R-squared, RMSE, MAE and residual ranking. The largest residuals become the records worth checking manually.",
-        "crisp_deploy": "Deployment: provide a bilingual Streamlit interface, sample-data download, CSV upload, source notes and a downloadable CRISP-DM report.",
+        "crisp_deploy": "Deployment: provide a bilingual Streamlit interface, sample-data download, source notes and a downloadable CRISP-DM report. External upload is intentionally removed until a schema validator is defined.",
     },
     "zh": {
         "page_title": "線性迴歸實作",
@@ -114,17 +108,16 @@ TEXT = {
         "hero_subtitle": "以台中、彰化空氣品質為情境，展示基礎迴歸建模、殘差排序與異常觀測判讀。",
         "theme": "主題",
         "language": "語言",
-        "to_zh": "繁體中文",
-        "to_en": "English",
+        "to_zh": "🌐 繁",
+        "to_en": "🌐 EN",
         "light": "淺色",
         "dark": "深色",
-        "theme_light_btn": "淺色",
-        "theme_dark_btn": "深色",
+        "theme_light_btn": "☀️",
+        "theme_dark_btn": "🌙",
         "regression_tab": "迴歸模擬器",
         "aqi_tab": "中彰 AQI 案例",
         "crisp_tab": "CRISP-DM 報告",
         "source_tab": "資料來源評估",
-        "sidebar_title": "專案控制台",
         "synthetic_title": "迴歸模擬器",
         "synthetic_note": "此區保留數值迴歸的核心流程：用 n、a、b、變異數產生資料，擬合迴歸線，再用殘差排序找出異常觀測。",
         "synthetic_params": "模擬參數",
@@ -145,16 +138,11 @@ TEXT = {
         "top_outliers": "殘差最高觀測",
         "aqi_title": "中彰 AQI 實際案例",
         "aqi_note": "此區以台中與彰化空氣品質資料預測數值目標，並找出基礎模型較難解釋的污染觀測。",
-        "advanced_data": "進階資料來源",
-        "use_external": "使用外部 AQI CSV",
-        "upload_label": "上傳 Kaggle 或環境部 AQI CSV",
-        "upload_help": "選填。未上傳時會使用內建中彰 AQI sample。",
         "target": "預測目標",
         "features": "特徵欄位",
         "source_run": "本次資料來源",
         "complete_rows": "完整資料筆數",
         "bundled_sample": "內建中彰 sample",
-        "uploaded_csv": "上傳 CSV",
         "coefficients": "模型係數",
         "actual_predicted": "實際值與預測值",
         "perfect_prediction": "理想預測線",
@@ -189,7 +177,7 @@ TEXT = {
         "crisp_prep": "資料準備：正規化欄位名稱、保留數值欄位、移除不完整資料，並讓使用者選擇預測目標與特徵。",
         "crisp_model": "模型建立：訓練簡單線性迴歸 baseline，產生每筆觀測的預測值。",
         "crisp_eval": "模型評估：使用 R-squared、RMSE、MAE 與殘差排序；殘差最大的資料就是最值得人工檢查的觀測。",
-        "crisp_deploy": "部署應用：提供雙語 Streamlit 介面、sample 資料下載、CSV 上傳、資料來源說明與可下載 CRISP-DM 報告。",
+        "crisp_deploy": "部署應用：提供雙語 Streamlit 介面、sample 資料下載、資料來源說明與可下載 CRISP-DM 報告。外部上傳在尚未定義 schema 驗證前先移除。",
     },
 }
 
@@ -478,16 +466,15 @@ st.markdown(
 t = TEXT[st.session_state.locale].get
 
 with st.sidebar:
-    st.markdown(f"### {t('sidebar_title')}")
     col_lang, col_theme = st.columns(2)
     with col_lang:
         lang_label = t("to_en") if st.session_state.locale == "zh" else t("to_zh")
-        if st.button(lang_label, use_container_width=True, key="lang_toggle"):
+        if st.button(lang_label, use_container_width=True, key="lang_toggle", help=t("language")):
             st.session_state.locale = "en" if st.session_state.locale == "zh" else "zh"
             st.rerun()
     with col_theme:
         theme_label = t("theme_dark_btn") if st.session_state.theme == "light" else t("theme_light_btn")
-        if st.button(theme_label, use_container_width=True, key="theme_toggle"):
+        if st.button(theme_label, use_container_width=True, key="theme_toggle", help=t("theme")):
             st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
             st.rerun()
 
@@ -642,11 +629,11 @@ The app reports R-squared, RMSE and MAE. It also ranks observations by absolute 
 
 ## 6. Deployment
 
-The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, CSV upload, source notes and plain-language explanations below the chart.
+The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, source notes and plain-language explanations below the chart. External upload is intentionally removed until a schema validator is defined.
 """
 
 
-def source_download_panel() -> None:
+def source_download_panel(panel_id: str) -> None:
     sample_bytes = SAMPLE_AQI_PATH.read_bytes()
     report_text = CRISP_REPORT_PATH.read_text(encoding="utf-8") if CRISP_REPORT_PATH.exists() else report_markdown()
 
@@ -671,6 +658,7 @@ def source_download_panel() -> None:
             file_name="central_taiwan_aqi_sample.csv",
             mime="text/csv",
             use_container_width=True,
+            key=f"download_sample_{panel_id}",
         )
     with col_report:
         st.download_button(
@@ -679,6 +667,7 @@ def source_download_panel() -> None:
             file_name="crisp_dm_report.md",
             mime="text/markdown",
             use_container_width=True,
+            key=f"download_report_{panel_id}",
         )
 
 
@@ -703,7 +692,7 @@ def crisp_report_tab() -> None:
             """,
             unsafe_allow_html=True,
         )
-    source_download_panel()
+    source_download_panel("crisp")
 
 
 def plain_aqi_reading(model_df: pd.DataFrame, target_col: str) -> None:
@@ -800,18 +789,10 @@ def aqi_case() -> None:
         f'<div class="note">{t("aqi_note")}</div>',
         unsafe_allow_html=True,
     )
-    source_download_panel()
+    source_download_panel("aqi")
 
-    uploaded = None
-    with st.sidebar.expander(t("advanced_data"), expanded=False):
-        uploaded = st.file_uploader(t("upload_label"), type=["csv"], help=t("upload_help"))
-
-    if uploaded is not None:
-        raw_df = pd.read_csv(uploaded)
-        source_label = t("uploaded_csv")
-    else:
-        raw_df = pd.read_csv(SAMPLE_AQI_PATH)
-        source_label = t("bundled_sample")
+    raw_df = pd.read_csv(SAMPLE_AQI_PATH)
+    source_label = t("bundled_sample")
 
     df = normalize_aqi_columns(raw_df)
     if "county" in df.columns:
@@ -943,4 +924,4 @@ with tab_crisp:
 with tab_sources:
     st.subheader(t("source_title"))
     st.markdown(t("source_body"))
-    source_download_panel()
+    source_download_panel("source")

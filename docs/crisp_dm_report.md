@@ -32,4 +32,4 @@ The app reports R-squared, RMSE and MAE. It also ranks observations by absolute 
 
 ## 6. Deployment
 
-The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, CSV upload, source notes and plain-language explanations below the chart.
+The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, source notes and plain-language explanations below the chart. External upload is intentionally removed until a schema validator is defined.
