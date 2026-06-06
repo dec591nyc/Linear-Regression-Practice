@@ -17,7 +17,12 @@ except Exception:  # pragma: no cover - fallback keeps the demo readable without
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 SAMPLE_AQI_PATH = PROJECT_ROOT / "data" / "central_taiwan_aqi_sample.csv"
+CRISP_REPORT_PATH = PROJECT_ROOT / "docs" / "crisp_dm_report.md"
 CENTRAL_COUNTIES = ["臺中市", "台中市", "彰化縣"]
+DEFAULT_SOURCE_NAME = "Kaggle Taiwan Air Quality Index Data 2016~2024"
+DEFAULT_SOURCE_URL = "https://www.kaggle.com/datasets/taweilo/taiwan-air-quality-data-20162024"
+OFFICIAL_SOURCE_NAME = "MOENV AQX_P_432"
+OFFICIAL_SOURCE_URL = "https://data.moenv.gov.tw/dataset/detail/aqx_p_432"
 
 TEXT = {
     "en": {
@@ -26,11 +31,17 @@ TEXT = {
         "hero_subtitle": "A compact regression dashboard for testing baseline modeling, residual ranking, and central Taiwan air-quality use cases.",
         "theme": "Theme",
         "language": "Language",
+        "to_zh": "繁體中文",
+        "to_en": "English",
         "light": "Light",
         "dark": "Dark",
+        "theme_light_btn": "Light",
+        "theme_dark_btn": "Dark",
         "regression_tab": "Regression Sandbox",
         "aqi_tab": "Central Taiwan AQI",
+        "crisp_tab": "CRISP-DM Report",
         "source_tab": "Source Evaluation",
+        "sidebar_title": "Project Controls",
         "synthetic_title": "Regression Sandbox",
         "synthetic_note": "This sandbox keeps the required numeric regression workflow: generate data with n, a, b, and variance, fit a line, then rank the top residual outliers.",
         "synthetic_params": "Synthetic Parameters",
@@ -64,6 +75,10 @@ TEXT = {
         "coefficients": "Coefficients",
         "actual_predicted": "Actual vs Predicted",
         "perfect_prediction": "Perfect prediction",
+        "source_panel_title": "Default data source",
+        "source_panel_body": "The bundled sample is a compact central Taiwan AQI example shaped from the same field logic as Taiwan AQI open-data records. It is small enough for a classroom demo while keeping the same numeric modeling workflow.",
+        "download_data": "Download sample CSV",
+        "download_report": "Download CRISP-DM report",
         "source_title": "Data Source Evaluation",
         "source_body": """
         - Kaggle `Taiwan Air Quality Index Data 2016~2024` is useful for reproducible modeling practice because the data has already been collected and shaped for analysis.
@@ -84,6 +99,14 @@ TEXT = {
         "chart_plain_aqi": "Each dot is one air-quality record. The horizontal position is what the model guessed, and the vertical position is the real value. Dots close to the diagonal line mean the model guessed well. Dots far from the line are records worth checking because the pollutant pattern looked unusual.",
         "chart_plain_stats": "In this run, the average {target} is {avg:.1f}. The largest miss is about {residual:.1f}. This does not automatically mean the air is dangerous; it means the reading does not match the simple pattern learned from the selected pollutants.",
         "chart_plain_caution": "Because this is a small baseline demo, use it to understand patterns and suspicious records, not as an official air-quality forecast.",
+        "crisp_title": "CRISP-DM practice report",
+        "crisp_intro": "CRISP-DM turns this project from a charting demo into a repeatable data-mining workflow: first define the air-quality question, then understand data fields, prepare numeric inputs, train a baseline model, evaluate residuals, and package the result for reuse.",
+        "crisp_business": "Business understanding: identify air-quality observations that do not follow the usual pollutant pattern, so a user can inspect unusual AQI readings faster.",
+        "crisp_data": "Data understanding: use station-level AQI fields such as PM2.5, PM10, O3, NO2, CO, SO2 and wind speed. The default sample focuses on Taichung and Changhua.",
+        "crisp_prep": "Data preparation: normalize column names, keep numeric fields, remove incomplete rows, and let users choose the prediction target and features.",
+        "crisp_model": "Modeling: train a simple linear regression baseline and produce predicted values.",
+        "crisp_eval": "Evaluation: use R-squared, RMSE, MAE and residual ranking. The largest residuals become the records worth checking manually.",
+        "crisp_deploy": "Deployment: provide a bilingual Streamlit interface, sample-data download, CSV upload, source notes and a downloadable CRISP-DM report.",
     },
     "zh": {
         "page_title": "線性迴歸實作",
@@ -91,11 +114,17 @@ TEXT = {
         "hero_subtitle": "以台中、彰化空氣品質為情境，展示基礎迴歸建模、殘差排序與異常觀測判讀。",
         "theme": "主題",
         "language": "語言",
+        "to_zh": "繁體中文",
+        "to_en": "English",
         "light": "淺色",
         "dark": "深色",
+        "theme_light_btn": "淺色",
+        "theme_dark_btn": "深色",
         "regression_tab": "迴歸模擬器",
         "aqi_tab": "中彰 AQI 案例",
+        "crisp_tab": "CRISP-DM 報告",
         "source_tab": "資料來源評估",
+        "sidebar_title": "專案控制台",
         "synthetic_title": "迴歸模擬器",
         "synthetic_note": "此區保留數值迴歸的核心流程：用 n、a、b、變異數產生資料，擬合迴歸線，再用殘差排序找出異常觀測。",
         "synthetic_params": "模擬參數",
@@ -129,6 +158,10 @@ TEXT = {
         "coefficients": "模型係數",
         "actual_predicted": "實際值與預測值",
         "perfect_prediction": "理想預測線",
+        "source_panel_title": "預設資料來源",
+        "source_panel_body": "內建 sample 是一份中彰 AQI 小型示範資料，欄位邏輯對齊台灣空氣品質開放資料。它保留 AQI、污染物、風速、測站與縣市欄位，適合用來示範數值建模流程。",
+        "download_data": "下載 sample CSV",
+        "download_report": "下載 CRISP-DM 報告",
         "source_title": "資料來源評估",
         "source_body": """
         - Kaggle `Taiwan Air Quality Index Data 2016~2024` 適合展示與練習，因為資料已整理成可分析格式。
@@ -149,6 +182,14 @@ TEXT = {
         "chart_plain_aqi": "每一個點代表一筆空氣品質觀測。橫軸是模型猜出的數值，縱軸是真實數值。點越靠近斜線，代表模型猜得越準；離斜線越遠，代表這筆資料和一般污染物規律不太一樣，值得再檢查。",
         "chart_plain_stats": "本次資料的平均 {target} 約為 {avg:.1f}，最大誤差約為 {residual:.1f}。這不一定代表空氣很危險，而是代表這筆觀測不太符合目前模型學到的簡單規律。",
         "chart_plain_caution": "因為這是小型 baseline demo，適合用來理解污染趨勢與可疑觀測，不適合作為正式空氣品質預報。",
+        "crisp_title": "CRISP-DM 實踐報告",
+        "crisp_intro": "CRISP-DM 讓這個專案不只是畫圖工具，而是一個可重複使用的數據探勘流程：先定義空氣品質問題，再理解資料欄位、整理數值特徵、建立 baseline 模型、評估殘差，最後包裝成可操作的分析介面。",
+        "crisp_business": "商業理解：找出不符合一般污染物規律的空氣品質觀測，協助使用者更快注意可疑 AQI 讀數。",
+        "crisp_data": "資料理解：使用測站層級 AQI 欄位，例如 PM2.5、PM10、O3、NO2、CO、SO2 與風速；預設 sample 聚焦台中與彰化。",
+        "crisp_prep": "資料準備：正規化欄位名稱、保留數值欄位、移除不完整資料，並讓使用者選擇預測目標與特徵。",
+        "crisp_model": "模型建立：訓練簡單線性迴歸 baseline，產生每筆觀測的預測值。",
+        "crisp_eval": "模型評估：使用 R-squared、RMSE、MAE 與殘差排序；殘差最大的資料就是最值得人工檢查的觀測。",
+        "crisp_deploy": "部署應用：提供雙語 Streamlit 介面、sample 資料下載、CSV 上傳、資料來源說明與可下載 CRISP-DM 報告。",
     },
 }
 
@@ -165,25 +206,7 @@ if "theme" not in st.session_state:
 if "locale" not in st.session_state:
     st.session_state.locale = "zh"
 
-with st.sidebar:
-    st.session_state.locale = st.radio(
-        "Language / 語言",
-        ["zh", "en"],
-        index=["zh", "en"].index(st.session_state.locale),
-        horizontal=True,
-        format_func=lambda value: "繁中" if value == "zh" else "English",
-    )
-
 t = TEXT[st.session_state.locale].get
-
-with st.sidebar:
-    st.session_state.theme = st.radio(
-        t("theme"),
-        ["light", "dark"],
-        index=["light", "dark"].index(st.session_state.theme),
-        horizontal=True,
-        format_func=lambda value: t(value),
-    )
 
 THEMES = {
     "light": {
@@ -232,6 +255,10 @@ st.markdown(
         background: {theme["bg"]};
         color: {theme["text"]};
     }}
+    [data-testid="stApp"], .stApp {{
+        background: {theme["bg"]} !important;
+        color: {theme["text"]} !important;
+    }}
     [data-testid="stAppViewContainer"] *,
     [data-testid="stSidebar"] * {{
         color: {theme["text"]};
@@ -242,9 +269,15 @@ st.markdown(
         padding-bottom: 2.25rem;
     }}
     [data-testid="stHeader"] {{
-        background: transparent;
+        background: {theme["bg"]} !important;
     }}
-    [data-testid="stSidebar"] {{
+    [data-testid="stHeader"] *,
+    [data-testid="stToolbar"] *,
+    .stAppToolbar * {{
+        color: {theme["text"]} !important;
+    }}
+    [data-testid="stSidebar"],
+    section[data-testid="stSidebar"] {{
         background: {theme["panel"]};
         border-right: 1px solid {theme["border"]};
     }}
@@ -308,6 +341,26 @@ st.markdown(
     }}
     button {{
         color: {theme["control_text"]} !important;
+    }}
+    div.stButton > button,
+    div[data-testid="stDownloadButton"] > button {{
+        background: {theme["control_bg"]} !important;
+        color: {theme["control_text"]} !important;
+        border: 1px solid {theme["border"]} !important;
+        border-radius: 8px !important;
+        font-weight: 650 !important;
+    }}
+    div.stButton > button:hover,
+    div[data-testid="stDownloadButton"] > button:hover {{
+        border-color: {theme["accent"]} !important;
+        color: {theme["accent"]} !important;
+    }}
+    div[data-testid="stSlider"] * {{
+        color: {theme["text"]} !important;
+    }}
+    div[data-testid="stSlider"] [role="slider"] {{
+        background-color: #ef6359 !important;
+        border-color: #ef6359 !important;
     }}
     [data-testid="stMetric"] {{
         background: {theme["metric_bg"]};
@@ -396,10 +449,47 @@ st.markdown(
         margin: 0.35rem 0;
         color: {theme["text"]};
     }}
+    .source-card,
+    .crisp-card {{
+        background: {theme["panel"]};
+        border: 1px solid {theme["border"]};
+        border-radius: 8px;
+        padding: 1rem 1.1rem;
+        margin: 0.8rem 0 1rem;
+        color: {theme["text"]};
+        line-height: 1.65;
+    }}
+    .source-card h4,
+    .crisp-card h4 {{
+        margin: 0 0 0.5rem;
+        color: {theme["text"]};
+        font-size: 1.03rem;
+    }}
+    .source-card a,
+    .crisp-card a {{
+        color: {theme["accent"]} !important;
+        font-weight: 650;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+t = TEXT[st.session_state.locale].get
+
+with st.sidebar:
+    st.markdown(f"### {t('sidebar_title')}")
+    col_lang, col_theme = st.columns(2)
+    with col_lang:
+        lang_label = t("to_en") if st.session_state.locale == "zh" else t("to_zh")
+        if st.button(lang_label, use_container_width=True, key="lang_toggle"):
+            st.session_state.locale = "en" if st.session_state.locale == "zh" else "zh"
+            st.rerun()
+    with col_theme:
+        theme_label = t("theme_dark_btn") if st.session_state.theme == "light" else t("theme_light_btn")
+        if st.button(theme_label, use_container_width=True, key="theme_toggle"):
+            st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
+            st.rerun()
 
 
 def fit_linear_model(feature_df: pd.DataFrame, target: pd.Series):
@@ -515,6 +605,107 @@ def metric_explanation(result: dict) -> None:
     )
 
 
+def report_markdown() -> str:
+    return f"""# CRISP-DM Report: Linear Regression Practice
+
+## 1. Business Understanding
+
+This project uses central Taiwan air-quality data to identify observations that do not follow the usual pollutant pattern. The practical goal is to help a non-technical user notice suspicious AQI readings faster.
+
+## 2. Data Understanding
+
+Default source: {DEFAULT_SOURCE_NAME}
+
+Default source URL: {DEFAULT_SOURCE_URL}
+
+Official replacement source: {OFFICIAL_SOURCE_NAME}
+
+Official source URL: {OFFICIAL_SOURCE_URL}
+
+The bundled sample keeps station, county, publish time, AQI, PM2.5, PM10, O3, NO2, CO, SO2 and wind-speed-like numeric fields. The default scope focuses on Taichung and Changhua.
+
+## 3. Data Preparation
+
+- Normalize common AQI column names.
+- Convert pollutant and weather fields into numeric values.
+- Filter central Taiwan counties when county data exists.
+- Drop rows missing the selected target or feature fields.
+- Let users choose a target and feature set in the interface.
+
+## 4. Modeling
+
+The app trains a simple linear regression baseline. It predicts a numeric target, such as AQI, from selected pollutant fields.
+
+## 5. Evaluation
+
+The app reports R-squared, RMSE and MAE. It also ranks observations by absolute residual. Large residuals are the records where the model's guess differs most from the actual value.
+
+## 6. Deployment
+
+The result is packaged as a bilingual Streamlit app with light/dark themes, sample data download, CSV upload, source notes and plain-language explanations below the chart.
+"""
+
+
+def source_download_panel() -> None:
+    sample_bytes = SAMPLE_AQI_PATH.read_bytes()
+    report_text = CRISP_REPORT_PATH.read_text(encoding="utf-8") if CRISP_REPORT_PATH.exists() else report_markdown()
+
+    st.markdown(
+        f"""
+        <div class="source-card">
+            <h4>{t("source_panel_title")}</h4>
+            <p>{t("source_panel_body")}</p>
+            <p><strong>{DEFAULT_SOURCE_NAME}</strong><br>
+            <a href="{DEFAULT_SOURCE_URL}" target="_blank">{DEFAULT_SOURCE_URL}</a></p>
+            <p><strong>{OFFICIAL_SOURCE_NAME}</strong><br>
+            <a href="{OFFICIAL_SOURCE_URL}" target="_blank">{OFFICIAL_SOURCE_URL}</a></p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    col_data, col_report = st.columns(2)
+    with col_data:
+        st.download_button(
+            t("download_data"),
+            data=sample_bytes,
+            file_name="central_taiwan_aqi_sample.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+    with col_report:
+        st.download_button(
+            t("download_report"),
+            data=report_text.encode("utf-8"),
+            file_name="crisp_dm_report.md",
+            mime="text/markdown",
+            use_container_width=True,
+        )
+
+
+def crisp_report_tab() -> None:
+    phases = [
+        t("crisp_business"),
+        t("crisp_data"),
+        t("crisp_prep"),
+        t("crisp_model"),
+        t("crisp_eval"),
+        t("crisp_deploy"),
+    ]
+    st.subheader(t("crisp_title"))
+    st.markdown(f'<div class="note">{t("crisp_intro")}</div>', unsafe_allow_html=True)
+    for index, phase in enumerate(phases, start=1):
+        st.markdown(
+            f"""
+            <div class="crisp-card">
+                <h4>{index}. {phase.split("：", 1)[0].split(":", 1)[0]}</h4>
+                <p>{phase}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    source_download_panel()
+
+
 def plain_aqi_reading(model_df: pd.DataFrame, target_col: str) -> None:
     avg_target = float(model_df[target_col].mean())
     max_residual = float(model_df["abs_residual"].max())
@@ -609,6 +800,7 @@ def aqi_case() -> None:
         f'<div class="note">{t("aqi_note")}</div>',
         unsafe_allow_html=True,
     )
+    source_download_panel()
 
     uploaded = None
     with st.sidebar.expander(t("advanced_data"), expanded=False):
@@ -735,8 +927,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-tab_synthetic, tab_aqi, tab_sources = st.tabs(
-    [t("regression_tab"), t("aqi_tab"), t("source_tab")]
+tab_synthetic, tab_aqi, tab_crisp, tab_sources = st.tabs(
+    [t("regression_tab"), t("aqi_tab"), t("crisp_tab"), t("source_tab")]
 )
 
 with tab_synthetic:
@@ -745,6 +937,10 @@ with tab_synthetic:
 with tab_aqi:
     aqi_case()
 
+with tab_crisp:
+    crisp_report_tab()
+
 with tab_sources:
     st.subheader(t("source_title"))
     st.markdown(t("source_body"))
+    source_download_panel()
