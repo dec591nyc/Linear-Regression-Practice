@@ -14,7 +14,6 @@ try:
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 except Exception:  # pragma: no cover - fallback keeps the demo readable without sklearn.
-    ElasticNet = None
     Lasso = None
     LinearRegression = None
     Ridge = None
@@ -54,7 +53,7 @@ TEXT = {
     "en": {
         "page_title": "Linear Regression Practice",
         "hero_title": "Linear Regression Practice",
-        "hero_subtitle": "Lab uses synthetic data to explain regression mechanics; AQI uses central Taiwan air-quality records for the practical case.",
+        "hero_subtitle": "Simulator uses formula simulation data to understand regression; AQI uses central Taiwan air-quality records for the practical case.",
         "theme": "Theme",
         "language": "Language",
         "sidebar_toggle": "Toggle sidebar",
@@ -64,19 +63,18 @@ TEXT = {
         "dark": "Dark",
         "theme_light_btn": "☀️",
         "theme_dark_btn": "🌙",
-        "regression_tab": "Regression Sandbox",
+        "regression_tab": "Regression Simulator",
         "aqi_tab": "Central AQI",
-        "crisp_tab": "CRISP-DM Report",
+        "crisp_tab": "CRISP-DM Analysis Report",
         "source_tab": "Data Source",
-        "nav_lab": "Lab",
+        "nav_lab": "Simulator",
         "nav_aqi": "AQI",
         "nav_report": "Report",
         "nav_data": "Data Source",
-        "synthetic_title": "Regression Sandbox",
-        "synthetic_note": "This sandbox keeps the required numeric regression workflow: generate data with n, a, b, and variance, fit a line, then rank the top residual outliers.",
-        "synthetic_source_title": "Regression sandbox data source",
-        "synthetic_source_body": "This model uses synthetic numeric data generated in memory by app.py from y = a*x + b + noise. It has no CSV file. It is not teacher-provided classroom data, not Kaggle data, and not MOENV records. The parameters in the sidebar are the data source for Lab.",
-        "synthetic_purpose": "Design purpose: the sandbox isolates the core regression requirement before moving to real air-quality data. It helps a non-technical user see that residuals are simply the gaps between a model's guess and the actual generated value.",
+        "synthetic_title": "Regression Simulator",
+        "synthetic_note": "This sandbox uses controlled numeric data to show how sample size, slope, intercept, noise and model choice change a regression result.",
+        "synthetic_source_title": "Simulator Data Source",
+        "synthetic_source_body": "Simulator page simulates a demonstration dataset based on explicit parameters: `x` is sampled uniformly from -100 to 100; `noise` is sampled from a normal distribution with mean 0 and standard deviation `sqrt(var)`; `y` is calculated as `a*x + b + noise`. The sample size, slope, intercept, noise variance, and random seed on the left are the data generation conditions.",
         "synthetic_params": "Synthetic Parameters",
         "sample_size": "Sample size (n)",
         "slope": "True slope (a)",
@@ -90,7 +88,8 @@ TEXT = {
         "mae": "MAE",
         "model": "Model",
         "model_choice": "Linear model",
-        "model_comparison": "Linear model comparison",
+        "model_comparison": "Model comparison",
+        "model_comparison_note": "This comparison keeps the same target and features, then changes only the linear model. Keep it when you want to see whether a more constrained model improves stability; otherwise treat OLS as the clearest baseline.",
         "model_profile_title": "Model reading",
         "model_ols": "OLS Linear Regression",
         "model_ridge": "Ridge Regression",
@@ -106,11 +105,11 @@ TEXT = {
         "equation_note": "The equation is shown for every selected linear model. For Ridge, Lasso and ElasticNet, coefficients are based on standardized inputs, so use it as a model-reading aid rather than a raw-unit business formula.",
         "generated_data": "Generated data",
         "outliers": "Top 10 residual outliers",
-        "outlier_plain_note": "Residual means the gap between the actual value and the model's prediction. The top 10 residual rows are the observations where the model was most wrong, so they are useful for checking unusual records first.",
+        "outlier_plain_note": "Residual means actual value minus predicted value. A large absolute residual does not automatically mean the row is wrong; it means the row deserves review because the model could not explain it well.",
         "true_line": "True line",
         "regression_line": "Regression line",
         "top_outliers": "Top residual observations",
-        "outlier_scope_note": "Showing the top 10 rows ranked by absolute residual. The full table is not shown because the active AQI dataset can contain tens of thousands of rows; this view focuses on the observations most worth manual review.",
+        "outlier_scope_note": "Showing the top 10 rows ranked by absolute residual. The full table is not shown because the active dataset can contain many rows; this view focuses on the observations most worth manual review.",
         "aqi_title": "Central Taiwan Air Quality Index (AQI) Modeling",
         "aqi_note": "Air Quality Index (AQI) is a single number that summarizes air-pollution level. This case prioritizes recent Taichung, Changhua and Nantou observations, then predicts a numeric target and surfaces observations that the baseline model cannot explain well.",
         "aqi_params": "AQI Controls",
@@ -119,8 +118,8 @@ TEXT = {
         "region_taichung": "Taichung",
         "region_changhua": "Changhua",
         "region_nantou": "Nantou",
-        "active_data": "Active data",
-        "data_rows": "Rows",
+        "active_data": "Reference data",
+        "data_rows": "Filtered rows",
         "data_scope": "Scope",
         "data_period": "Period",
         "recent_sample": "MOENV central Taiwan AQI sample",
@@ -130,27 +129,24 @@ TEXT = {
         "target": "Target variable",
         "features": "Feature variables",
         "source_run": "Data source in this run",
-        "complete_rows": "Complete rows used",
+        "complete_rows": "Model-ready rows",
         "bundled_sample": "Bundled central Taiwan sample",
         "coefficients": "Coefficients",
         "actual_predicted": "Actual vs Predicted",
         "perfect_prediction": "Perfect prediction",
-        "source_panel_title": "Active data source",
-        "source_panel_body": "AQI modeling reads the local CSV shown below. The active file is a central Taiwan MOENV-style Air Quality Index dataset with Taichung, Changhua and Nantou records, kept within the requested 20,000-100,000 row range. Kaggle is kept as a reproducible historical reference, not the active app file.",
+        "source_panel_title": "Active dataset",
+        "source_panel_body": "The AQI page reads only one built-in CSV file bundled inside the project repository's 'data/' folder on GitHub. Whether running locally or deployed on cloud environments (like Streamlit Community Cloud), the app automatically accesses this bundled file, and users can fully download this real-world dataset via the download button or directly from the GitHub repository folder. Kaggle and MOENV links are reference sources, not extra files loaded at runtime.",
         "sample_scope_note": "Sample scope: the active CSV has {rows} rows. Tiny demo data is not used.",
-        "download_data": "Download active AQI CSV",
-        "download_report": "Download CRISP-DM report",
+        "download_data": "Download CSV",
+        "download_report": "Download report",
         "source_title": "Data Source",
-        "source_body": """
-        **What this page answers**
-
-        - **AQI case:** uses `data/central_taiwan_aqi_sample.csv`, the active central Taiwan AQI CSV in this repository.
-        - **Lab:** does not read any CSV. It generates synthetic values inside `app.py` from `y = a*x + b + noise`, so Lab is not teacher data, Kaggle data, or MOENV data.
-        - **Why Kaggle is listed:** Kaggle `Taiwan Air Quality Index Data 2016~2024` is a reproducible historical reference if the project needs a public archived source.
-        - **Why MOENV is listed:** MOENV `AQX_P_488` is the official historical AQI source, and `AQX_P_432` is the real-time hourly reference.
-        - **Why there is no tiny fallback:** 24-row demo data was removed because it cannot support model conclusions.
-        - **What the download button does:** it downloads the exact CSV currently used by the AQI page.
-        """,
+        "source_intro": "",
+        "source_adopt_title": "Data Sources Adopted",
+        "source_adopt_body": "This project's AQI modeling page only loads a single built-in real-world dataset bundled inside the GitHub repository: <strong>central_taiwan_aqi_sample.csv</strong> (located in the <code>data/</code> directory). When deployed to a cloud platform (e.g., Streamlit Community Cloud), this bundled file is packaged and deployed alongside the application code. Web users can fully download this CSV via the download button below, or obtain it directly from the GitHub repository folder.<br/><br/>To ensure the modeling and analysis reference clear benchmarks, the <strong>references and adoption conclusions</strong> are as follows:<ol><li><strong>Official Historical Standard (Primary Benchmark)</strong>: The Ministry of Environment's <a href=\"https://data.moenv.gov.tw/en/dataset/detail/aqx_p_488\" target=\"_blank\">MOENV AQX_P_488 Historical Air Quality Records</a> serves as our main historical reference.</li><li><strong>Real-time Standard</strong>: The Ministry of Environment's <a href=\"https://data.moenv.gov.tw/dataset/detail/aqx_p_432\" target=\"_blank\">MOENV AQX_P_432 Real-time AQI</a> serves as our dynamic reference for current observations.</li><li><strong>Archival Option</strong>: The <a href=\"https://www.kaggle.com/datasets/taweilo/taiwan-air-quality-data-20162024\" target=\"_blank\">Kaggle Taiwan Air Quality Data (2016~2024)</a> serves as an alternative archive option for reproducible offline historical experiments.</li></ol>",
+        "source_quality_title": "Suitability Statement",
+        "source_quality_body": "Practicing linear regression using AQI. Considering sample size and web performance constraints, the data is restricted to Central Taiwan (covering Taichung, Changhua, and Nantou). It is suitable for residual ranking and model interpretation, rather than official forecasting services.",
+        "download_hint_data": "Exports the exact CSV loaded by the AQI page.",
+        "download_hint_report": "Exports the current-language business analysis report.",
         "too_few_cols": "AQI data needs at least two numeric columns after cleaning.",
         "select_feature": "Select at least one feature variable.",
         "too_few_rows": "The selected columns have too few complete rows for a useful regression.",
@@ -160,23 +156,37 @@ TEXT = {
         "metric_r2_weak": "R-squared is weak. Treat this as a baseline model, not a reliable predictor.",
         "metric_error_note": "RMSE and MAE are average error indicators. Lower values mean the prediction is closer to the actual target.",
         "metric_outlier_note": "Rows with the largest absolute residuals are the observations most worth checking manually.",
-        "chart_plain_title": "Plain-language reading",
+        "chart_plain_title": "Data reading",
         "chart_plain_aqi": "Each dot is one Air Quality Index (AQI) record or selected numeric air-quality target. The horizontal position is what the model guessed, and the vertical position is the real value. Dots close to the diagonal line mean the model guessed well. Dots far from the line are records worth checking because the pollutant pattern looked unusual.",
         "chart_plain_stats": "In this run, the average {target} is {avg:.1f}. The largest miss is about {residual:.1f}. This does not automatically mean the air is dangerous; it means the reading does not match the simple pattern learned from the selected pollutants.",
-        "chart_plain_caution": "Because this is a small baseline demo, use it to understand patterns and suspicious records, not as an official air-quality forecast.",
-        "crisp_title": "CRISP-DM practice report",
-        "crisp_intro": "CRISP-DM turns this project from a charting demo into a repeatable data-mining workflow: first define the air-quality question, then understand data fields, prepare numeric inputs, train a baseline model, evaluate residuals, and package the result for reuse.",
-        "crisp_business": "Business understanding: identify air-quality observations that do not follow the usual pollutant pattern, so a user can inspect unusual AQI readings faster.",
+        "chart_plain_caution": "Use this baseline to understand patterns and review candidates, not as an official air-quality forecast.",
+        "lab_plain_title": "Data reading",
+        "lab_plain_body": "Each dot is one generated observation. The dashed line is the rule used to create the data; the fitted line is what the selected model learned from the points. When noise increases, the points spread out and the fitted line becomes harder to trust.",
+        "lab_plain_stats": "",
+        "interpretation_title": "Model summary",
+        "learning_title": "Regression metric guide",
+        "learning_body": "R-squared, also called the coefficient of determination, shows how much target variation the model explains. RMSE means Root Mean Squared Error and is sensitive to larger misses. MAE means Mean Absolute Error and shows the average absolute miss in a more direct way. Residual ranking then identifies the records that deserve review.",
+        "crisp_title": "CRISP-DM Analysis Report: AQI Linear Regression and Anomaly Detection in Central Taiwan",
+        "crisp_intro": "This report presents a systematic evaluation of the Central Taiwan Air Quality Index (AQI) linear regression modeling and anomaly monitoring prototype, framed under the CRISP-DM framework from the professional perspective and tone of a Business Analyst.",
+        "crisp_business": "Business understanding: help local environmental or public-health analysts prioritize air-quality observations that deserve review because they do not follow the usual pollutant pattern.",
         "crisp_data": "Data understanding: use station-level Air Quality Index (AQI) fields such as PM2.5, PM10, O3, NO2, CO, SO2 and wind speed. The preferred app dataset is recent central Taiwan data after 2018; tiny demo data is not used.",
         "crisp_prep": "Data preparation: normalize column names, keep numeric fields, remove incomplete rows, and let users choose the prediction target and features.",
         "crisp_model": "Modeling: train a simple linear regression baseline and produce predicted values.",
         "crisp_eval": "Evaluation: use R-squared, RMSE, MAE and residual ranking. The largest residuals become the records worth checking manually.",
-        "crisp_deploy": "Deployment: provide a bilingual Streamlit interface, active AQI CSV download, source notes and a downloadable CRISP-DM report. External upload is intentionally removed until a schema validator is defined.",
+        "crisp_deploy": "Deployment: provide a bilingual Streamlit interface, active AQI CSV download, source notes and a downloadable business analysis report. External upload is intentionally removed until a schema validator is defined.",
+        "report_audience_title": "Intended audience",
+        "report_audience_body": "Primary: local government environmental and public-health analysts. Secondary: community environmental groups, facility or campus operations teams, and residents who need a readable explanation. This is not a consumer forecast product.",
+        "report_question_title": "Decision question",
+        "report_question_body": "Which station-time observations in Taichung, Changhua and Nantou look inconsistent with the selected pollutant pattern, and should be reviewed before making operational or communication decisions?",
+        "report_value_title": "Business value",
+        "report_value_body": "The model does not declare air quality safe or unsafe. It reduces review workload by ranking unusual records first, so analysts can inspect station issues, weather effects, pollutant spikes or data-quality problems sooner.",
+        "report_limit_title": "Governance limits",
+        "report_limit_body": "Use the output as a screening layer. Official alerts, enforcement, health guidance and resident-facing risk messages still require domain review and official monitoring rules.",
     },
     "zh": {
         "page_title": "線性迴歸實作",
         "hero_title": "線性迴歸實作",
-        "hero_subtitle": "Lab 用合成資料理解迴歸；AQI 頁才使用中部空氣品質資料做實際案例。",
+        "hero_subtitle": "Simulator 以公式示範資料理解迴歸；AQI 使用中部空氣品質資料做實際案例。",
         "theme": "主題",
         "language": "語言",
         "sidebar_toggle": "切換側邊欄",
@@ -188,17 +198,16 @@ TEXT = {
         "theme_dark_btn": "🌙",
         "regression_tab": "迴歸模擬器",
         "aqi_tab": "中部 AQI",
-        "crisp_tab": "CRISP-DM 報告",
+        "crisp_tab": "CRISP-DM 分析報告",
         "source_tab": "Data Source",
-        "nav_lab": "Lab",
+        "nav_lab": "Simulator",
         "nav_aqi": "AQI",
         "nav_report": "Report",
         "nav_data": "Data Source",
         "synthetic_title": "迴歸模擬器",
-        "synthetic_note": "此區保留數值迴歸的核心流程：用 n、a、b、變異數產生資料，擬合迴歸線，再用殘差排序找出異常觀測。",
-        "synthetic_source_title": "迴歸模擬器資料來源",
-        "synthetic_source_body": "這個模型使用 app.py 依照 y = a*x + b + noise 在記憶體即時產生的合成數值資料，沒有對應 CSV 檔。它不是老師課堂提供資料、不是 Kaggle，也不是環境部資料。Lab 的資料來源就是左側參數：樣本數、斜率、截距、雜訊變異數與隨機種子。",
-        "synthetic_purpose": "設計用意：模擬器先隔離出回歸作業的核心流程，再接到真實空氣品質案例。對非技術使用者來說，殘差就是模型猜測值和實際值之間的差距。",
+        "synthetic_note": "此區使用可控制的數值資料，觀察樣本數、斜率、截距、雜訊與模型選擇如何改變迴歸結果。",
+        "synthetic_source_title": "Simulator 資料來源",
+        "synthetic_source_body": "Simulator 分頁僅以公式模擬：`x` 從 -100 到 100 的均勻分布抽樣，`noise` 來自平均值 0、標準差 `sqrt(var)` 的常態分布，`y` 則由 `a*x + b + noise` 計算而來。左側的樣本數、斜率、截距、雜訊變異數與隨機種子都是資料生成條件。",
         "synthetic_params": "模擬參數",
         "sample_size": "樣本數 (n)",
         "slope": "真實斜率 (a)",
@@ -212,7 +221,8 @@ TEXT = {
         "mae": "MAE",
         "model": "模型",
         "model_choice": "線性模型",
-        "model_comparison": "線性模型比較",
+        "model_comparison": "模型比較",
+        "model_comparison_note": "此比較固定同一組目標與特徵，只更換線性模型。若想確認正規化模型是否讓結果更穩定，可以保留；若只需要最容易說明的基準模型，OLS 就是最清楚的參考。",
         "model_profile_title": "模型解讀",
         "model_ols": "OLS 普通最小平方法",
         "model_ridge": "Ridge 迴歸",
@@ -228,11 +238,11 @@ TEXT = {
         "equation_note": "每一種線性模型都會顯示方程式，維持呈現一致。Ridge、Lasso、ElasticNet 的係數來自標準化輸入，適合輔助理解模型，不建議直接當成原始單位的商業公式。",
         "generated_data": "模擬資料",
         "outliers": "殘差前 10 名",
-        "outlier_plain_note": "殘差就是實際值和模型預測值之間的差距。殘差前 10 名代表模型最猜不準的 10 筆資料，適合優先人工檢查是否有異常或特殊情況。",
+        "outlier_plain_note": "殘差是實際值減掉預測值。絕對殘差很大不代表資料一定錯，而是代表模型無法很好解釋這筆資料，適合優先檢查。",
         "true_line": "真實線",
         "regression_line": "迴歸線",
         "top_outliers": "殘差最高觀測",
-        "outlier_scope_note": "此處只顯示依絕對殘差排序前 10 筆。完整資料可能有數萬筆，全部列出會干擾閱讀；這個區塊聚焦最值得人工檢查的觀測。",
+        "outlier_scope_note": "此處只顯示依絕對殘差排序前 10 筆。完整資料可能很多，全部列出會干擾閱讀；這個區塊聚焦最值得人工檢查的觀測。",
         "aqi_title": "中部空氣品質指標 (AQI) 建模",
         "aqi_note": "空氣品質指標 (Air Quality Index, AQI) 是把空氣污染狀況整理成單一數字的指標。此區優先使用台中、彰化、南投的近期觀測，預測數值目標，並找出基礎模型較難解釋的污染觀測。",
         "aqi_params": "AQI 控制項",
@@ -241,8 +251,8 @@ TEXT = {
         "region_taichung": "台中",
         "region_changhua": "彰化",
         "region_nantou": "南投",
-        "active_data": "目前資料",
-        "data_rows": "資料筆數",
+        "active_data": "參考資料",
+        "data_rows": "篩選後資料筆數",
         "data_scope": "資料範圍",
         "data_period": "資料期間",
         "recent_sample": "環境部中部 AQI sample",
@@ -252,48 +262,59 @@ TEXT = {
         "target": "預測目標",
         "features": "特徵欄位",
         "source_run": "本次資料來源",
-        "complete_rows": "完整資料筆數",
+        "complete_rows": "建模可用筆數",
         "bundled_sample": "內建中彰 sample",
         "coefficients": "模型係數",
         "actual_predicted": "實際值與預測值",
         "perfect_prediction": "理想預測線",
-        "source_panel_title": "目前使用資料",
-        "source_panel_body": "AQI 建模讀取下方列出的本機 CSV。啟用檔案是台中、彰化、南投的中部空氣品質指標資料，樣本數控制在 2 萬到 10 萬筆。Kaggle 保留為可重現歷史參考，不是目前 app 實際讀取檔案。",
-        "sample_scope_note": "樣本範圍：目前啟用 CSV 有 {rows} 筆。24 筆微型 demo 不再使用。",
-        "download_data": "下載目前 AQI CSV",
-        "download_report": "下載 CRISP-DM 報告",
+        "source_panel_title": "啟用資料集",
+        "source_panel_body": "AQI 頁面僅讀取一份專案內建的 CSV 檔案（已打包在 GitHub 倉庫的 'data/' 目錄中）。不論是在本機開發或是部署於雲端平台，系統均能自動讀取該目錄下的資料，且使用者皆可點擊「下載 CSV」按鈕正常下載此真實世界數據，或直接在 GitHub 原始碼目錄下載。Kaggle 與環境部連結則是作為資料參考來源。",
+        "sample_scope_note": "樣本範圍：目前啟用 CSV 有 {rows} 筆。",
+        "download_data": "下載 CSV",
+        "download_report": "下載報告",
         "source_title": "Data Source",
-        "source_body": """
-        **這頁回答三件事**
-
-        - **AQI 案例用什麼：**使用 `data/central_taiwan_aqi_sample.csv`，也就是此 repo 目前啟用的中部 AQI CSV。
-        - **Lab 用什麼：**Lab 不讀取任何 CSV，而是在 `app.py` 依照 `y = a*x + b + noise` 即時合成資料，所以不是老師資料、不是 Kaggle、也不是環境部資料。
-        - **Kaggle 為何列出：**`Taiwan Air Quality Index Data 2016~2024` 是可重現的歷史參考來源，當需要公開 archived data 時可以回頭採用。
-        - **環境部為何列出：**`AQX_P_488` 是官方歷史 AQI 來源，`AQX_P_432` 是即時每小時 AQI 參考。
-        - **為何沒有 24 筆 fallback：**24 筆 demo 無法支撐模型結論，因此已移除。
-        - **下載按鈕做什麼：**下載 AQI 頁面目前實際使用的同一份 CSV。
-        """,
+        "source_intro": "",
+        "source_adopt_title": "採用資料來源",
+        "source_adopt_body": "本專案的 AQI 建模僅實際載入一份專案 GitHub 倉庫內建的真實世界資料集：<strong>central_taiwan_aqi_sample.csv</strong>（存放於專案原始碼的 <code>data/</code> 目錄中）。當應用程式部署於雲端平台（如 Streamlit Community Cloud）時，此內建檔案會隨同程式碼打包部署，網頁使用者皆可點擊下方按鈕直接下載該 CSV 檔案，亦可直接至 GitHub 原始碼目錄下載。<br/><br/>為確保模型開發與分析具有可信的參考對照，本專案之<strong>參考來源與採用結論</strong>如下：<ol><li><strong>官方歷史資料 (主要對照基準)</strong>：環境部 <a href=\"https://data.moenv.gov.tw/en/dataset/detail/aqx_p_488\" target=\"_blank\">MOENV AQX_P_488 歷史空氣品質監測資料庫</a>，作為歷史比對之主體。</li><li><strong>即時觀測參考</strong>：環境部 <a href=\"https://data.moenv.gov.tw/dataset/detail/aqx_p_432\" target=\"_blank\">MOENV AQX_P_432 即時空氣品質指標</a>，作為即時監控時的動態參照。</li><li><strong>存檔封存方案</strong>：<a href=\"https://www.kaggle.com/datasets/taweilo/taiwan-air-quality-data-20162024\" target=\"_blank\">Kaggle Taiwan Air Quality Data (2016~2024)</a>，作為需要離線重現歷史封存數據時的公開封存檔案替代方案。</li></ol>",
+        "source_quality_title": "適用性說明",
+        "source_quality_body": "以 AQI 實踐線性迴歸，考量樣本數及網頁效能限制，將數據控制在中部地區（涵蓋台中、彰化、南投）。本系統適合用於殘差排序與模型判讀，不等於官方預報服務。",
+        "download_hint_data": "匯出 AQI 分頁實際載入的 CSV。",
+        "download_hint_report": "匯出目前語言版本的 CRISP-DM 分析報告。",
         "too_few_cols": "清理後的 AQI 資料至少需要兩個數值欄位。",
         "select_feature": "請至少選擇一個特徵欄位。",
-        "too_few_rows": "所選欄位的完整資料筆數太少，不適合建立迴歸模型。",
+        "too_few_rows": "所選欄位的建模可用筆數太少，不適合建立迴歸模型。",
         "metric_status_title": "指標狀況",
         "metric_r2_strong": "R-squared 表現佳，代表本次模型能解釋多數目標變化。",
         "metric_r2_ok": "R-squared 表現中等，模型抓到部分規律，但仍需要看殘差。",
         "metric_r2_weak": "R-squared 偏弱，這次結果適合視為 baseline，不宜當作可靠預測模型。",
         "metric_error_note": "RMSE 與 MAE 是平均誤差指標，數值越低代表預測越接近實際目標。",
         "metric_outlier_note": "絕對殘差最大的資料列，就是最值得人工檢查的異常觀測。",
-        "chart_plain_title": "白話解讀",
+        "chart_plain_title": "數據解讀",
         "chart_plain_aqi": "每一個點代表一筆空氣品質指標 (Air Quality Index, AQI) 或目前選定的空氣品質數值目標。橫軸是模型猜出的數值，縱軸是真實數值。點越靠近斜線，代表模型猜得越準；離斜線越遠，代表這筆資料和一般污染物規律不太一樣，值得再檢查。",
         "chart_plain_stats": "本次資料的平均 {target} 約為 {avg:.1f}，最大誤差約為 {residual:.1f}。這不一定代表空氣很危險，而是代表這筆觀測不太符合目前模型學到的簡單規律。",
-        "chart_plain_caution": "因為這是小型 baseline demo，適合用來理解污染趨勢與可疑觀測，不適合作為正式空氣品質預報。",
-        "crisp_title": "CRISP-DM 實踐報告",
-        "crisp_intro": "CRISP-DM 讓這個專案不只是畫圖工具，而是一個可重複使用的數據探勘流程：先定義空氣品質問題，再理解資料欄位、整理數值特徵、建立 baseline 模型、評估殘差，最後包裝成可操作的分析介面。",
-        "crisp_business": "商業理解：找出不符合一般污染物規律的空氣品質觀測，協助使用者更快注意可疑 AQI 讀數。",
+        "chart_plain_caution": "這個 baseline 適合用來理解污染趨勢與可疑觀測，不適合作為正式空氣品質預報。",
+        "lab_plain_title": "數據解讀",
+        "lab_plain_body": "每個點代表一筆產生出的觀測。虛線是資料生成規則，迴歸線是模型從點位中學到的結果。雜訊越高，點越分散，模型線也越不容易穩定。",
+        "lab_plain_stats": "",
+        "interpretation_title": "模型摘要",
+        "learning_title": "迴歸判讀說明",
+        "learning_body": "R-squared 又稱判定係數，用來看模型能解釋多少目標變化。RMSE 是 Root Mean Squared Error，中文可理解為均方根誤差，對大型誤差比較敏感。MAE 是 Mean Absolute Error，中文可理解為平均絕對誤差，代表平均猜錯多少。殘差排序則用來找出最值得複查的資料列。",
+        "crisp_title": "CRISP-DM 分析報告：中部空氣品質線性迴歸與異常監測",
+        "crisp_intro": "本報告以商業分析的視角並結合 CRISP-DM 框架系統性說明中部地區空氣品質指標 (AQI) 線性迴歸建模與異常監測的原型評估。",
+        "crisp_business": "商業理解：協助地方環境或公共衛生分析人員，優先找出不符合一般污染物規律、值得複查的空氣品質觀測。",
         "crisp_data": "資料理解：使用測站層級空氣品質指標 (AQI) 欄位，例如 PM2.5、PM10、O3、NO2、CO、SO2 與風速；理想 app 資料是 2018 以後近期中部資料，微型 demo 資料不再使用。",
         "crisp_prep": "資料準備：正規化欄位名稱、保留數值欄位、移除不完整資料，並讓使用者選擇預測目標與特徵。",
         "crisp_model": "模型建立：訓練簡單線性迴歸 baseline，產生每筆觀測的預測值。",
         "crisp_eval": "模型評估：使用 R-squared、RMSE、MAE 與殘差排序；殘差最大的資料就是最值得人工檢查的觀測。",
-        "crisp_deploy": "部署應用：提供雙語 Streamlit 介面、目前 AQI CSV 下載、資料來源說明與可下載 CRISP-DM 報告。外部上傳在尚未定義 schema 驗證前先移除。",
+        "crisp_deploy": "部署應用：提供雙語 Streamlit 介面、目前 AQI CSV 下載、資料來源說明與可下載商業分析報告。外部上傳在尚未定義 schema 驗證前先移除。",
+        "report_audience_title": "目標受眾",
+        "report_audience_body": "主要受眾是地方政府環境與公共衛生分析人員；次要受眾是社區環保倡議者、園區或校園營運管理者，以及想要了解空氣品質的居民。",
+        "report_question_title": "決策問題",
+        "report_question_body": "在台中、彰化、南投的測站紀錄中，哪些站點與時間的觀測值不符合目前污染物組合的通常規律，需要先複查再進一步做營運或溝通判斷？",
+        "report_value_title": "分析價值",
+        "report_value_body": "模型不判定空氣安全或危險，而是把最不容易被 baseline 解釋的紀錄排到前面，協助分析人員更快檢查測站異常、天候影響、污染物突增或資料品質問題。",
+        "report_limit_title": "治理限制",
+        "report_limit_body": "此結果適合作為篩選層。正式警示、稽查、健康建議與居民風險溝通，仍需結合專業審查與官方監測規範。",
     },
 }
 
@@ -312,7 +333,7 @@ if "locale" not in st.session_state:
 if "sidebar_collapsed" not in st.session_state:
     st.session_state.sidebar_collapsed = False
 if "active_page" not in st.session_state:
-    st.session_state.active_page = "lab"
+    st.session_state.active_page = "simulator"
 
 t = TEXT[st.session_state.locale].get
 
@@ -460,6 +481,18 @@ st.markdown(
         top: 0.55rem !important;
         right: 0.75rem !important;
         pointer-events: auto !important;
+    }}
+    [data-testid="stAppViewContainer"] svg,
+    [data-testid="stSidebar"] svg,
+    .st-emotion-cache-28gi3v {{
+        color: {theme["text"]} !important;
+        fill: currentColor !important;
+    }}
+    div.stButton svg,
+    div[data-testid="stDownloadButton"] svg,
+    button[data-testid^="stBaseButton"] svg {{
+        color: inherit !important;
+        fill: currentColor !important;
     }}
     [class*="st-key-sidebar_state_toggle"] {{
         position: fixed !important;
@@ -759,10 +792,18 @@ st.markdown(
     .metric-explain strong {{
         color: {theme["accent"]};
     }}
+    .metric-explain h4 {{
+        margin: 0 0 0.55rem 0;
+        font-size: 1.03rem;
+        color: {theme["text"]};
+    }}
+    .metric-explain p {{
+        margin: 0.45rem 0;
+    }}
     .equation-card code {{
         display: block;
         margin-top: 0.35rem;
-        font-size: 1.05rem;
+        font-size: 1.12rem;
         line-height: 1.8;
         color: {theme["text"]};
         white-space: normal;
@@ -809,6 +850,79 @@ st.markdown(
         color: {theme["accent"]} !important;
         font-weight: 650;
     }}
+    .page-intro {{
+        color: {theme["muted"]};
+        max-width: 860px;
+        margin: 0.15rem 0 1.05rem;
+        line-height: 1.65;
+        font-size: 0.96rem;
+    }}
+    .insight-grid {{
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin: 0.85rem 0 1rem;
+    }}
+    .insight-card {{
+        background: {theme["panel"]};
+        border: 1px solid {theme["border"]};
+        border-radius: 8px;
+        padding: 1rem 1.05rem;
+        color: {theme["text"]};
+        min-height: 132px;
+    }}
+    .insight-card h4 {{
+        margin: 0 0 0.5rem 0;
+        font-size: 1.02rem;
+        color: {theme["text"]};
+    }}
+    .insight-card p {{
+        margin: 0;
+        color: {theme["muted"]};
+        line-height: 1.62;
+    }}
+    .source-summary {{
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 0.85rem;
+        margin: 0.9rem 0 1rem;
+    }}
+    .source-summary .source-card {{
+        margin: 0;
+    }}
+    .source-meta {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.7rem;
+    }}
+    .source-pill {{
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid {theme["border"]};
+        border-radius: 999px;
+        padding: 0.32rem 0.62rem;
+        color: {theme["text"]};
+        background: {theme["panel_alt"]};
+        font-size: 0.86rem;
+        font-weight: 650;
+    }}
+    .reference-list {{
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 0.6rem;
+    }}
+    .reference-item {{
+        border: 1px solid {theme["border"]};
+        border-radius: 8px;
+        padding: 0.7rem 0.8rem;
+        background: {theme["panel_alt"]};
+    }}
+    .reference-item strong {{
+        display: block;
+        color: {theme["text"]};
+        margin-bottom: 0.25rem;
+    }}
     .learning-step {{
         background: {theme["panel_alt"]};
         border: 1px solid {theme["border"]};
@@ -820,12 +934,63 @@ st.markdown(
     .learning-step strong {{
         color: {theme["accent"]};
     }}
-    .download-panel {{
+    .section-heading {{
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin: 1.1rem 0 0.45rem;
+    }}
+    .section-heading h4 {{
+        margin: 0;
+        font-size: 1.03rem;
+        color: {theme["text"]};
+    }}
+    .info-tip {{
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        border: 1px solid {theme["button_border"]};
+        color: {theme["accent"]};
         background: {theme["panel_alt"]};
+        font-size: 0.82rem;
+        font-weight: 800;
+        cursor: help;
+    }}
+    .info-tip-text {{
+        position: absolute;
+        left: 0;
+        top: 28px;
+        z-index: 50;
+        display: none;
+        min-width: 280px;
+        max-width: 420px;
+        padding: 0.75rem 0.85rem;
+        border-radius: 8px;
+        border: 1px solid {theme["border"]};
+        background: {theme["panel"]};
+        color: {theme["text"]};
+        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.18);
+        line-height: 1.55;
+        font-weight: 500;
+    }}
+    .info-tip:hover .info-tip-text,
+    .info-tip:focus .info-tip-text {{
+        display: block;
+    }}
+    .download-panel {{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: {theme["panel"]};
         border: 1px solid {theme["border"]};
         border-radius: 8px;
         padding: 0.95rem 1rem;
-        margin: 0.4rem 0 0.8rem;
+        margin: 0.75rem 0 0.8rem;
         color: {theme["text"]};
     }}
     .download-panel .file-name {{
@@ -835,6 +1000,34 @@ st.markdown(
     .download-panel .file-meta {{
         color: {theme["muted"]};
         font-size: 0.9rem;
+    }}
+    .download-panel .file-icon {{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: {theme["note_bg"]};
+        color: {theme["accent"]};
+        font-weight: 800;
+        flex: 0 0 auto;
+    }}
+    .download-copy {{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        min-width: 0;
+    }}
+    @media (max-width: 760px) {{
+        .insight-grid,
+        .source-summary {{
+            grid-template-columns: 1fr;
+        }}
+        .download-panel {{
+            align-items: flex-start;
+            flex-direction: column;
+        }}
     }}
     .js-plotly-plot .modebar {{
         display: none !important;
@@ -896,7 +1089,7 @@ NOISE_PRESETS = {
 SEED_PRESETS = {
     "zero": {"value": 0, "label": {"en": "Fixed start - 0", "zh": "固定起點 - 0"}},
     "small": {"value": 7, "label": {"en": "Small test - 7", "zh": "小型測試 - 7"}},
-    "demo": {"value": 42, "label": {"en": "Common demo - 42", "zh": "常用示範 - 42"}},
+    "demo": {"value": 42, "label": {"en": "Common reference - 42", "zh": "常用參考 - 42"}},
     "year": {"value": 2024, "label": {"en": "Year marker - 2024", "zh": "年度示範 - 2024"}},
     "alternate": {"value": 1001, "label": {"en": "Alternate sample - 1001", "zh": "替代樣本 - 1001"}},
 }
@@ -912,6 +1105,10 @@ def model_reading(model_key: str) -> str:
 
 def preset_label(presets: dict, preset_key: str) -> str:
     return presets[preset_key]["label"][st.session_state.locale]
+
+
+def localized_key(base_key: str) -> str:
+    return f"{base_key}_{st.session_state.locale}"
 
 
 def sync_noise_preset() -> None:
@@ -1136,14 +1333,17 @@ def get_numeric_columns(df: pd.DataFrame) -> list[str]:
 
 
 def show_metrics(result: dict) -> None:
-    cols = st.columns(4)
+    cols = st.columns(3)
     cols[0].metric(t("r2"), f"{result['r2']:.3f}")
     cols[1].metric(t("rmse"), f"{result['rmse']:.2f}")
     cols[2].metric(t("mae"), f"{result['mae']:.2f}")
-    cols[3].metric(t("model"), result["model_name"])
 
 
 def metric_explanation(result: dict) -> None:
+    st.markdown(f'<div class="metric-explain">{metric_explanation_html(result)}</div>', unsafe_allow_html=True)
+
+
+def metric_explanation_html(result: dict) -> str:
     if result["r2"] >= 0.8:
         r2_text = t("metric_r2_strong")
     elif result["r2"] >= 0.5:
@@ -1151,15 +1351,10 @@ def metric_explanation(result: dict) -> None:
     else:
         r2_text = t("metric_r2_weak")
 
-    st.markdown(
-        f"""
-        <div class="metric-explain">
-            <strong>{t("metric_status_title")}：</strong>{r2_text}<br>
-            {t("metric_error_note")}<br>
-            {t("metric_outlier_note")}
-        </div>
-        """,
-        unsafe_allow_html=True,
+    return (
+        f"<p><strong>{t('metric_status_title')}:</strong> {r2_text}<br>"
+        f"{t('metric_error_note')}<br>"
+        f"{t('metric_outlier_note')}</p>"
     )
 
 
@@ -1173,6 +1368,14 @@ def model_profile(result: dict) -> None:
         </div>
         """,
         unsafe_allow_html=True,
+    )
+
+
+def model_profile_html(result: dict) -> str:
+    note = t("coefficient_note") if result["model_key"] != "ols" else ""
+    return (
+        f"<p><strong>{t('model_profile_title')}:</strong> {model_reading(result['model_key'])}"
+        f"{f'<br>{note}' if note else ''}</p>"
     )
 
 
@@ -1197,12 +1400,49 @@ def show_model_equation(result: dict, feature_names: list[str], target_name: str
     )
 
 
+def model_equation_html(result: dict, feature_names: list[str], target_name: str = "y") -> str:
+    note = t("equation_note") if result["model_key"] != "ols" else ""
+    return (
+        f"<p><strong>{t('equation')}:</strong>"
+        f"<code>{equation_text(result, feature_names, target_name)}</code>"
+        f"{f'<br>{note}' if note else ''}</p>"
+    )
+
+
+def interpretation_panel(result: dict, feature_names: list[str], target_name: str = "y") -> None:
+    st.markdown(
+        f"""
+        <div class="metric-explain equation-card">
+            <h4>{t("interpretation_title")}</h4>
+            {metric_explanation_html(result)}
+            {model_profile_html(result)}
+            {model_equation_html(result, feature_names, target_name)}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def residual_scope_note() -> None:
     st.markdown(
         f"""
         <div class="metric-explain">
             <strong>{t("top_outliers")}:</strong> {t("outlier_plain_note")}<br>
             {t("outlier_scope_note")}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def residual_heading_with_tooltip(title_key: str = "top_outliers") -> None:
+    st.markdown(
+        f"""
+        <div class="section-heading">
+            <h4>{t(title_key)}</h4>
+            <span class="info-tip" tabindex="0">?
+                <span class="info-tip-text">{t("outlier_plain_note")}<br>{t("outlier_scope_note")}</span>
+            </span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1268,15 +1508,15 @@ def filter_by_region(df: pd.DataFrame, region_key: str) -> pd.DataFrame:
 
 
 def page_navigation() -> str:
-    options = ["lab", "aqi", "data", "report"]
+    options = ["simulator", "aqi", "data", "report"]
     labels = {
-        "lab": t("nav_lab"),
+        "simulator": t("nav_lab"),
         "aqi": t("nav_aqi"),
         "report": t("nav_report"),
         "data": t("nav_data"),
     }
     icons = {
-        "lab": ":material/science:",
+        "simulator": ":material/science:",
         "aqi": ":material/air:",
         "report": ":material/description:",
         "data": ":material/dataset:",
@@ -1314,103 +1554,148 @@ def report_markdown(locale: str | None = None) -> str:
         else "no larger AQI CSV is available. The tiny demo fallback has been removed, so the project should switch to another public dataset or research topic."
     )
     if active_locale == "zh":
-        return f"""# CRISP-DM 報告：Linear Regression Practice
+        return f"""
 
-## 1. 商業理解
+本報告採用 CRISP-DM（跨行業數據挖掘標準流程）框架，系統性分析中部地區空氣品質指標 (AQI) 線性迴歸建模原型與異常觀測篩選工具。
 
-本專案用空氣品質指標 (Air Quality Index, AQI) 與污染物欄位建立線性回歸 baseline。目標不是取代官方預報，而是協助使用者快速看出哪些觀測不符合一般污染物規律，值得進一步檢查。
+本專案旨在提供一個科學且可複現的數據驅動流程，以輔助環境監測決策與資源調度。
 
-## 2. 資料理解
+## 1. 業務理解 (Business Understanding)
+*   **業務背景與組織痛點**：空氣品質指標 (AQI) 的異常數值往往與突發性本地污染、短暫天候效應或監測設備損壞密切相關。面對海量測站數據，傳統人工巡檢極為耗時，容易錯過關鍵異常事件。
+*   **目標受眾 (Target Audience)**：主要受眾為地方環境管理與公共衛生分析人員；次要受眾為社區監測設備維護人員與環保倡議小組。
+*   **核心決策問題 (Core Decision Question)**：在中部測站（台中、彰化、南投）的空污觀測紀錄中，哪些觀測值嚴重偏離了通常的污染物關聯規律，需要被優先進行複查？
+*   **專案核心目標**：建立線性迴歸模型作為**決策支持系統 (DSS)** 中的異常檢索引擎。透過污染物規律擬合，篩選出「高絕對殘差」的疑似異常觀測點（實際值與預測值偏差極大者），供環境監測部門優先複查，以迅速定位設備損壞、局部污染源突增或特殊天氣效應。
+*   **成功指標 (Success Metrics)**：
+    *   模型可解釋性：基準 Ordinary Least Squares (OLS) 的 R-squared 與誤差指標需保持在合理水平以提供可解釋的污染物規律。
+    *   業務實用性：能將前 10 筆高絕對殘差的疑似異常觀測自動彙整，顯著降低業務分析人員全面巡檢的時間成本。
 
-目前 app 實際使用資料：{data_label()}
+## 2. 數據理解 (Data Understanding)
+*   **數據來源、範疇與交代 (Data Sources)**：
+    *   專案內建資料集：採用託管於 GitHub 專案倉庫目錄下的真實世界資料集 `data/{active_file}`，共計 {SAMPLE_AQI_ROWS:,} 筆。考量地理特徵與效能限制，地理範疇控制在台中、彰化及南投測站數據。
+    *   官方歷史參考：環境部官方歷史監測資料庫 `MOENV AQX_P_488`，為歷史大數據比對的主體。
+    *   即時觀測參考：環境部官方即時指標 `MOENV AQX_P_432`，作即時動態比對。
+    *   封存替代方案：`Kaggle Taiwan Air Quality Data (2016~2024)`，用於離線可重現性分析。
+*   **變數分析**：
+    *   預測目標 (Target)：如 AQI 或 PM2.5 等單一數值目標。
+    *   預測特徵 (Features)：包括 PM2.5、PM10、O3、NO2、CO、SO2 及風速等。
+    *   關聯邏輯：例如，臭氧 (O3) 的濃度通常與光化學反應及氣溫有極大關聯；PM2.5 與 PM10 具有高度共線性，但若在特定測站出現兩者比例嚴重失衡，即可能為局部的特殊污染或儀器故障。
+*   **數據限制**：測站數據包含設備漂移、突發局部干擾等高頻噪音。線性模型難以完全配適非線性特徵，而這正是該模型作為異常檢測手段的關鍵：模型無法說明的「高殘差」即為最值得人為介入複查的「潛在異常」。
 
-實際檔案：`data/{active_file}`
+## 3. 數據準備 (Data Preparation)
+*   **數據清洗與格式對齊**：統一並正規化各污染物欄位名稱，將欄位轉為數值型態，並剔除包含缺失值 (NaN) 的觀測列以確保模型訓練品質。
+*   **數據篩選**：支援使用者依區域（中部、台中、彰化、南投）進行子集篩選，以排除不同縣市微氣候或地理屏障帶來的分析偏差。
+*   **特徵工程與標準化**：針對 Ridge、Lasso 及 ElasticNet 等正則化模型，在擬合前先對特徵進行標準化 (StandardScaler)，確保各污染物的係數權重可直接在同一尺度上進行方向與強度的比較。
 
-樣本數：{SAMPLE_AQI_ROWS:,} 筆
+## 4. 建立模型 (Modeling)
+本系統提供四種線性迴歸演算法，用以平衡模型解釋力與泛化能力：
+*   **OLS (普通最小平方法)**：作為最直觀、最容易向業務主管解釋的基準模型。
+*   **Ridge 迴歸 (脊迴歸)**：引入 L2 懲罰項，在污染物欄位高度相關（共線性）時，能有效穩定模型係數。
+*   **Lasso 迴歸 (套索迴歸)**：引入 L1 懲罰項，具有特徵篩選功能，會將微弱的特徵係數直接壓縮為 0，簡化模型結構。
+*   **ElasticNet 迴歸**：結合 L1 與 L2 懲罰，適合處理共線性特徵且需適度特徵刪減的情境。
 
-資料範圍：{zh_scope}
+## 5. 模型評估 (Evaluation)
+*   **評估指標定義**：
+    *   **R-squared (判定係數)**：衡量模型能解釋目標變數變異量的比例。
+    *   **RMSE (均方根誤差)**：反映預測值與實際值的平均偏差，因平方懲罰而對大誤差極為敏感。
+    *   **MAE (平均絕對誤差)**：呈現預測誤差的直觀物理意義（平均猜錯多少個 AQI 單位）。
+*   **殘差分析 (異常判定核心)**：計算 Residual = Actual - Predicted。絕對殘差值最大的前 10 筆觀測代表該時間點的空氣品質特徵嚴重偏離了區域大環境的平均統計規律（例如在低 NO2、CO 的情況下 PM2.5 卻異常暴增），極具人工複查價值。
 
-主要欄位：測站、縣市、發布時間、空氣品質指標 (Air Quality Index, AQI)、PM2.5、PM10、O3、NO2、CO、SO2、風速、風向、經緯度。
-
-官方來源：{OFFICIAL_SOURCE_NAME}
-
-MOENV URL：{OFFICIAL_SOURCE_URL}
-
-即時資料參考：{REALTIME_SOURCE_NAME} - {REALTIME_SOURCE_URL}
-
-Kaggle 歷史參考：{DEFAULT_SOURCE_NAME} - {DEFAULT_SOURCE_URL}
-
-Lab 來源邊界：Lab 不使用上述任何 CSV 或公開資料。Lab 由 `app.py` 依照 `y = a*x + b + noise` 在記憶體產生合成資料，左側參數就是資料生成條件。
-
-## 3. 資料準備
-
-- 正規化 AQI、污染物、風速與時間欄位名稱。
-- 將可建模欄位轉成數值。
-- 依 sidebar 選擇中部、台中、彰化或南投。
-- 移除目標欄位與特徵欄位缺值資料列。
-- 保留資料來源、樣本數與篩選範圍，避免把 demo 資料誤解成正式模型資料。
-
-## 4. 模型建立
-
-使用 OLS、Ridge、Lasso 與 ElasticNet 四種線性模型。OLS 作為最容易解釋的 baseline；Ridge 適合污染物高度相關時降低係數波動；Lasso 可用於特徵篩選；ElasticNet 則折衷穩定性與簡化。
-
-## 5. 模型評估
-
-使用 R-squared、RMSE、MAE 與殘差排序。R-squared 用來看模型解釋力；RMSE 與 MAE 用來看平均誤差；絕對殘差最大的資料列，是最值得人工檢查的異常觀測。
-
-## 6. 部署與使用
-
-結果包裝成雙語 Streamlit app，支援明暗主題、動態 sidebar、資料下載、白話解讀與依目前語言輸出的 CRISP-DM 報告。外部 CSV 上傳在尚未定義 schema 驗證前先移除。
+## 6. 模型部署與治理 (Deployment & Governance)
+*   **雲端部署與數據下載性**：
+    *   原型系統部署於雲端平台（如 Streamlit Community Cloud），並將 `data/` 目錄與程式碼一同打包。此做法確保了雲端環境下能直接進行高效的本機 CSV 讀取與建模，並且允許使用者隨時下載完整的真實世界 CSV 資料（亦可透過 GitHub 原始碼目錄下載）。
+    *   提供決策者一鍵切換特徵、目標、地區與模型的自助式分析平台，並支持乾淨 CSV 數據及本分析報告下載。
+*   **分析價值與決策輔助 (Business Value)**：本專案的核心價值在於**異常事件的快速篩選與工作流優化**。它能將最值得注意的高絕對殘差觀測自動排在最前列（前 10 名），大幅縮短監測人員篩查數據的時間，幫助相關團隊提早定位硬體漂移或地方污染事件。
+*   **業務治理限制與防線 (Governance Limits)**：
+    *   基準迴歸模型僅作輔助篩選（殘差排序與模型判讀），**不等於官方預報服務**。
+    *   正式的空氣品質裁決、健康建議與風險通報，仍必須結合監測人員之專業領域審查 (Domain Review) 與政府官方發布之正式指標。
+    *   後續建議引入資料版本控制與測站品質標籤，以進一步提升決策DSS的可靠度。
 """
 
-    return f"""# CRISP-DM Report: Linear Regression Practice
+    return f"""
+
+This report utilizes the CRISP-DM (Cross-Industry Standard Process for Data Mining) framework to systematically analyze the Central Taiwan Air Quality Index (AQI) linear regression modeling prototype and residual anomaly screening tool. 
+
+This project provides a scientific and reproducible data-driven pipeline to optimize monitoring decisions.
 
 ## 1. Business Understanding
-
-This project uses Air Quality Index (AQI) and pollutant fields to build a linear-regression baseline. The goal is not to replace official forecasts, but to help users notice observations that do not follow the usual pollutant pattern.
+*   **Business Background and Pain Points**: Anomalies in the Air Quality Index (AQI) are typically caused by localized sudden emission sources, transient weather phenomena, or monitoring equipment deterioration. In the face of massive station observations, manual checking is extremely labor-intensive, often leading to delayed reactions.
+*   **Target Audience**: Primary: local environmental and public health analysts/decision-makers; Secondary: community monitoring maintenance teams and environmental advocacy groups.
+*   **Core Decision Question**: Which station-time observations in Central Taiwan (Taichung, Changhua, Nantou) deviate from normal pollutant correlation patterns and should be prioritized for review?
+*   **Core Goal**: Develop a linear regression model as an anomaly screening engine for a **Decision Support System (DSS)**. By fitting pollutant correlation patterns, it isolates observations with high absolute residuals to help analysts quickly identify sensor faults or emission spikes.
+*   **Success Metrics**:
+    *   Model Interpretability: The baseline Ordinary Least Squares (OLS) model's R-squared and error metrics must remain stable to guarantee explainable pollutant relationships.
+    *   Operational Efficiency: Automatically rank and present the top 10 absolute residual observations, dramatically cutting down the time analysts spend on manual screening.
 
 ## 2. Data Understanding
-
-Current app data: {data_label()}
-
-Actual file: `data/{active_file}`
-
-Rows: {SAMPLE_AQI_ROWS:,}
-
-Scope: {en_scope}
-
-Main fields: station, county, publish time, Air Quality Index (AQI), PM2.5, PM10, O3, NO2, CO, SO2, wind speed, wind direction, longitude and latitude.
-
-Official source: {OFFICIAL_SOURCE_NAME}
-
-MOENV URL: {OFFICIAL_SOURCE_URL}
-
-Realtime data reference: {REALTIME_SOURCE_NAME} - {REALTIME_SOURCE_URL}
-
-Kaggle historical reference: {DEFAULT_SOURCE_NAME} - {DEFAULT_SOURCE_URL}
-
-Lab source boundary: Lab does not use any of the CSV or public sources above. It generates synthetic data in memory from `y = a*x + b + noise` inside `app.py`; the sidebar parameters are the data-generation conditions.
+*   **Data Sources and Disclosures**:
+    *   Bundled Dataset: Bundled real-world dataset `data/{active_file}` (totaling {SAMPLE_AQI_ROWS:,} records) hosted in the project repository on GitHub. Due to geography and performance constraints, the spatial coverage is focused on Taichung, Changhua, and Nantou monitoring stations.
+    *   Official Historical Benchmark: The Ministry of Environment's `MOENV AQX_P_488` historical dataset, serving as the main benchmark.
+    *   Real-time Reference: The `MOENV AQX_P_432` real-time API, referenced for current measurements.
+    *   Archival Option: `Kaggle Taiwan Air Quality Data (2016~2024)`, utilized for offline reproducibility.
+*   **Variable Analysis**:
+    *   Target Variable: e.g., AQI or PM2.5.
+    *   Feature Variables: Includes PM2.5, PM10, O3, NO2, CO, SO2, wind speed, etc.
+    *   Correlation Logic: For instance, Ozone (O3) typically correlates with photochemical reactions and temperature; PM2.5 and PM10 are collinear, but a sudden shift in their ratio at a specific station can indicate unique pollution spikes or sensor drift.
+*   **Data Constraints**: Station measurements contain high-frequency noise from instrument wear or temporary local events. Linear regression cannot capture all non-linear interactions; however, this is exactly the model's value as an anomaly detector: the high residual that the model fails to explain represents the "potential anomaly" most worthy of manual review.
 
 ## 3. Data Preparation
-
-- Normalize AQI, pollutant, wind and time column names.
-- Convert model-ready fields into numeric values.
-- Filter Central Taiwan, Taichung, Changhua or Nantou through the sidebar.
-- Drop rows missing the selected target or feature fields.
-- Keep source, row count and scope visible so demo data is not confused with a formal dataset.
+*   **Data Cleaning**: Standardize and normalize column names, convert fields to numeric types, and remove rows containing missing values (NaN) to ensure the quality of model training.
+*   **Data Filtering**: Allow users to filter subsets by region (Central, Taichung, Changhua, Nantou) to eliminate analytical biases brought by microclimates or geographical barriers in different counties.
+*   **Feature Engineering and Standardization**: For regularized models like Ridge, Lasso, and ElasticNet, scale features using `StandardScaler` prior to fitting. This ensures that the coefficients of various pollutants can be directly compared on the same scale for direction and magnitude.
 
 ## 4. Modeling
-
-The app uses four linear model variants: OLS, Ridge, Lasso and ElasticNet. OLS is the clearest baseline; Ridge helps when pollutant fields are correlated; Lasso helps with feature screening; ElasticNet balances stability and simplification.
+This system provides four linear regression algorithms to balance model interpretability and generalization ability:
+*   **OLS (Ordinary Least Squares)**: Served as the most intuitive baseline model, which is easy to explain to business executives.
+*   **Ridge Regression**: Introduces an L2 penalty, which effectively stabilizes model coefficients when pollutant fields are highly correlated (multicollinearity).
+*   **Lasso Regression**: Introduces an L1 penalty, which performs automatic feature selection by shrinking weak feature coefficients to exactly zero, simplifying the model structure.
+*   **ElasticNet Regression**: Combines L1 and L2 regularization, suitable for scenarios with collinear features where moderate feature elimination is desired.
 
 ## 5. Evaluation
+*   **Evaluation Metrics Definition**:
+    *   **R-squared (Coefficient of Determination)**: Measures the proportion of variance in the target variable explained by the model.
+    *   **RMSE (Root Mean Squared Error)**: Reflects the average deviation between predicted and actual values, highly sensitive to large errors due to squaring.
+    *   **MAE (Mean Absolute Error)**: Represents the straightforward physical meaning of the prediction error (the average unit of AQI guessed incorrectly).
+*   **Residual Analysis (Anomaly Detection Core)**: Calculated as Residual = Actual - Predicted. The top 10 observations with the largest absolute residuals represent times when the air quality characteristics deviated significantly from the regional average statistical pattern (e.g., a sudden spike in PM2.5 despite low NO2 and CO), indicating high value for manual inspection.
 
-The app reports R-squared, RMSE, MAE and residual ranking. Large absolute residuals are the observations most worth checking manually.
-
-## 6. Deployment
-
-The result is packaged as a bilingual Streamlit app with light/dark themes, dynamic sidebar controls, data download, plain-language explanations and a CRISP-DM report generated in the currently selected language. External upload is intentionally removed until a schema validator is defined.
+## 6. Deployment & Governance
+*   **Cloud Deployment and Data Access**:
+    *   The prototype is deployed in a cloud environment (e.g., Streamlit Community Cloud) with the `data/` directory bundled alongside the codebase. This ensures highly efficient local CSV reads and modeling under the cloud setup while allowing users to download the complete real-world CSV dataset at any time (also accessible via the GitHub repository directory).
+    *   Provides decision-makers with a self-service analysis platform to toggle features, targets, regions, and models, with support for downloading clean CSV data and this report.
+*   **Decision Value**: The primary value lies in **rapid anomaly indexing and workflow optimization**. It ranks the top 10 absolute residual observations automatically, reducing manual inspection time and helping teams catch sensor drifts or local spikes earlier.
+*   **Governance Limits and Warnings**:
+    *   The anomalous observations flagged by this system serve only as "inspection cues" and **do not constitute an official air quality forecast service**.
+    *   Official air quality rulings, health advice, and risk communication must still combine professional Domain Review by monitoring experts with official government releases.
+    *   Future recommendations include introducing data version control and station quality labels to further enhance the reliability of the decision DSS.
 """
+
+
+def download_action(panel_id: str, kind: str, label: str, hint: str, file_name: str, data: bytes, mime: str) -> None:
+    left, right = st.columns([3.2, 1])
+    icon = "CSV" if kind == "csv" else "MD"
+    with left:
+        st.markdown(
+            f"""
+            <div class="download-panel">
+                <div class="download-copy">
+                    <span class="file-icon">{icon}</span>
+                    <div>
+                        <div class="file-name">{file_name}</div>
+                        <div class="file-meta">{hint}</div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with right:
+        st.download_button(
+            label,
+            data=data,
+            file_name=file_name,
+            mime=mime,
+            width="stretch",
+            key=f"download_{kind}_{panel_id}",
+        )
 
 
 def source_download_panel(panel_id: str, include_report: bool = True) -> None:
@@ -1419,84 +1704,82 @@ def source_download_panel(panel_id: str, include_report: bool = True) -> None:
         return
     sample_bytes = SAMPLE_AQI_PATH.read_bytes()
     report_text = report_markdown(st.session_state.locale)
-    report_file_name = f"crisp_dm_report_{st.session_state.locale}.md"
+    report_file_name = f"business_analysis_report_{st.session_state.locale}.md"
     sample_file_name = SAMPLE_AQI_PATH.name
     limitation_note = ""
     if AQI_DATA_IS_LOCAL_HISTORICAL:
         limitation_note = f"<p>{t('local_historical_warning')}</p>"
 
+    file_meta = (
+        f"{data_label()} · {SAMPLE_AQI_ROWS:,} 筆 · {t('download_hint_data')}"
+        if st.session_state.locale == "zh"
+        else f"{data_label()} · {SAMPLE_AQI_ROWS:,} rows · {t('download_hint_data')}"
+    )
+    if limitation_note:
+        st.warning(t("local_historical_warning"))
+    download_action(
+        panel_id,
+        "csv",
+        t("download_data"),
+        file_meta,
+        sample_file_name,
+        sample_bytes,
+        "text/csv",
+    )
+    if include_report:
+        download_action(
+            panel_id,
+            "report",
+            t("download_report"),
+            t("download_hint_report"),
+            report_file_name,
+            report_text.encode("utf-8"),
+            "text/markdown",
+        )
+
+
+def data_source_tab() -> None:
+    if not AQI_DATA_AVAILABLE:
+        st.error(t("no_active_data"))
+        return
+    sample_file_name = SAMPLE_AQI_PATH.name
+    st.subheader(t("source_title"))
     st.markdown(
         f"""
         <div class="source-card">
-            <h4>{t("source_panel_title")}</h4>
-            <p><strong>{t("source_run")}:</strong> {data_label()}</p>
-            <p><strong>CSV:</strong> data/{sample_file_name}</p>
-            <p>{t("source_panel_body")}</p>
-            <p>{t("sample_scope_note").format(rows=SAMPLE_AQI_ROWS)}</p>
-            {limitation_note}
-            <p><strong>{DEFAULT_SOURCE_NAME}</strong><br>
-            <a href="{DEFAULT_SOURCE_URL}" target="_blank">{DEFAULT_SOURCE_URL}</a></p>
-            <p><strong>{OFFICIAL_SOURCE_NAME}</strong><br>
-            <a href="{OFFICIAL_SOURCE_URL}" target="_blank">{OFFICIAL_SOURCE_URL}</a></p>
-            <p><strong>{REALTIME_SOURCE_NAME}</strong><br>
-            <a href="{REALTIME_SOURCE_URL}" target="_blank">{REALTIME_SOURCE_URL}</a></p>
+            <h4>{t("source_adopt_title")}</h4>
+            <p>{t("source_adopt_body")}</p>
+            <div class="source-meta" style="margin-top: 1rem;">
+                <span class="source-pill">data/{sample_file_name}</span>
+                <span class="source-pill">{SAMPLE_AQI_ROWS:,} rows</span>
+                <span class="source-pill">Taichung / Changhua / Nantou</span>
+            </div>
+        </div>
+        <div class="source-card">
+            <h4>{t("source_quality_title")}</h4>
+            <p>{t("source_quality_body")}</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    if include_report:
-        col_data, col_report = st.columns(2)
-    else:
-        col_data = st.container()
-        col_report = None
-    file_meta = (
-        f"{data_label()} · {SAMPLE_AQI_ROWS:,} 筆 · AQI 頁目前使用資料"
-        if st.session_state.locale == "zh"
-        else f"{data_label()} · {SAMPLE_AQI_ROWS:,} rows · AQI page active dataset"
-    )
-    with col_data:
-        st.markdown(
-            f"""
-            <div class="download-panel">
-                <div class="file-name">data/{sample_file_name}</div>
-                <div class="file-meta">{file_meta}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.download_button(
-            t("download_data"),
-            data=sample_bytes,
-            file_name=sample_file_name,
-            mime="text/csv",
-            width="stretch",
-            key=f"download_sample_{panel_id}",
-        )
-    if col_report is not None:
-        with col_report:
-            st.download_button(
-                t("download_report"),
-                data=report_text.encode("utf-8"),
-                file_name=report_file_name,
-                mime="text/markdown",
-                width="stretch",
-                key=f"download_report_{panel_id}",
-            )
+    source_download_panel("source", include_report=False)
 
 
 def crisp_report_tab() -> None:
     report_text = report_markdown(st.session_state.locale)
+    report_file_name = f"crisp_dm_analysis_report_{st.session_state.locale}.md"
     st.subheader(t("crisp_title"))
-    st.markdown(f'<div class="note">{t("crisp_intro")}</div>', unsafe_allow_html=True)
     st.markdown(report_text)
-    st.download_button(
+    download_action(
+        "crisp_only",
+        "report",
         t("download_report"),
-        data=report_text.encode("utf-8"),
-        file_name=f"crisp_dm_report_{st.session_state.locale}.md",
-        mime="text/markdown",
-        width="stretch",
-        key="download_report_crisp_only",
+        t("download_hint_report"),
+        report_file_name,
+        report_text.encode("utf-8"),
+        "text/markdown",
     )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 def plain_aqi_reading(model_df: pd.DataFrame, target_col: str) -> None:
@@ -1515,36 +1798,31 @@ def plain_aqi_reading(model_df: pd.DataFrame, target_col: str) -> None:
     )
 
 
+def plain_lab_reading(n: int, a: float, b: float, var: float, seed: int) -> None:
+    stats = t("lab_plain_stats")
+    stats_html = f"<p>{stats.format(n=n, a=a, b=b, var=var, seed=seed)}</p>" if stats else ""
+    st.markdown(
+        f"""
+        <div class="plain-reading">
+            <h4>{t("lab_plain_title")}</h4>
+            <p>{t("lab_plain_body")}</p>
+            {stats_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def beginner_learning_panel() -> None:
-    if st.session_state.locale == "zh":
-        title = "線性迴歸小白學習路線"
-        steps = [
-            ("先看 x 和 y", "x 是輸入線索，y 是模型想猜的答案。Lab 的 y 由 app.py 依照 y = a*x + b + noise 即時合成。"),
-            ("一次只改一個參數", "樣本數 n 影響穩定性；斜率 a 影響 x 和 y 的關係強度；截距 b 會把整條線往上或往下移。"),
-            ("理解雜訊與種子", "雜訊變異數越高，點越散，模型越難猜準；隨機種子讓同一組設定可以重現同一批合成資料。"),
-            ("看殘差", "殘差是實際值和預測值的差距。殘差前 10 名不是一定錯，而是最值得人工檢查。"),
-            ("再切到 AQI", "AQI 頁使用真實空氣品質 CSV。Lab 的斜率、截距、雜訊和種子不會改動 AQI 資料。"),
-        ]
-    else:
-        title = "Beginner learning path"
-        steps = [
-            ("Start with x and y", "x is the input clue, and y is the answer the model tries to estimate. Lab y is generated in app.py from y = a*x + b + noise."),
-            ("Change one parameter at a time", "Sample size n affects stability; slope a changes the strength of the x/y pattern; intercept b moves the line up or down."),
-            ("Read noise and seed", "Higher noise variance spreads the points and makes prediction harder. The random seed makes the same settings reproducible."),
-            ("Check residuals", "A residual is actual value minus predicted value. The top 10 residuals are not automatically wrong; they are the first records to inspect."),
-            ("Then move to AQI", "The AQI page uses the real air-quality CSV. Lab slope, intercept, noise and seed do not modify AQI records."),
-        ]
-    st.markdown(f"#### {title}")
-    for heading, body in steps:
-        st.markdown(
-            f"""
-            <div class="learning-step">
-                <strong>{heading}</strong><br>
-                {body}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        f"""
+        <div class="source-card">
+            <h4>{t("learning_title")}</h4>
+            <p>{t("learning_body")}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def synthetic_lab() -> None:
@@ -1567,22 +1845,31 @@ def synthetic_lab() -> None:
     if not st.session_state.sidebar_collapsed:
         with st.sidebar:
             st.markdown(f"### {t('synthetic_params')}")
+            current_model = st.session_state.get("synthetic_model_choice", "ols")
             model_key = st.selectbox(
                 t("model_choice"),
                 available_models,
+                index=available_models.index(current_model) if current_model in available_models else 0,
                 format_func=model_label,
-                key="synthetic_model_choice",
+                key=localized_key("synthetic_model_choice"),
             )
+            st.session_state.synthetic_model_choice = model_key
             n = st.slider(t("sample_size"), 50, 1000, 300, 50, key="synthetic_n")
             a = st.slider(t("slope"), -50.0, 50.0, 8.0, 0.5, key="synthetic_a")
             b = st.slider(t("intercept"), -100.0, 100.0, 40.0, 1.0, key="synthetic_b")
-            st.selectbox(
+            current_var_preset = st.session_state.get("synthetic_var_preset", "medium")
+            selected_var_preset = st.selectbox(
                 t("variance_preset"),
                 list(NOISE_PRESETS.keys()),
+                index=list(NOISE_PRESETS.keys()).index(current_var_preset)
+                if current_var_preset in NOISE_PRESETS
+                else 2,
                 format_func=lambda key: preset_label(NOISE_PRESETS, key),
-                key="synthetic_var_preset",
-                on_change=sync_noise_preset,
+                key=localized_key("synthetic_var_preset"),
             )
+            if selected_var_preset != st.session_state.get("synthetic_var_preset"):
+                st.session_state.synthetic_var_preset = selected_var_preset
+                sync_noise_preset()
             var_kwargs = {
                 "label": t("variance"),
                 "min_value": 0.0,
@@ -1593,13 +1880,19 @@ def synthetic_lab() -> None:
             if "synthetic_var" not in st.session_state:
                 var_kwargs["value"] = 10000.0
             var = st.number_input(**var_kwargs)
-            st.selectbox(
+            current_seed_preset = st.session_state.get("synthetic_seed_preset", "demo")
+            selected_seed_preset = st.selectbox(
                 t("seed_preset"),
                 list(SEED_PRESETS.keys()),
+                index=list(SEED_PRESETS.keys()).index(current_seed_preset)
+                if current_seed_preset in SEED_PRESETS
+                else 2,
                 format_func=lambda key: preset_label(SEED_PRESETS, key),
-                key="synthetic_seed_preset",
-                on_change=sync_seed_preset,
+                key=localized_key("synthetic_seed_preset"),
             )
+            if selected_seed_preset != st.session_state.get("synthetic_seed_preset"):
+                st.session_state.synthetic_seed_preset = selected_seed_preset
+                sync_seed_preset()
             seed_kwargs = {
                 "label": t("seed"),
                 "min_value": 0,
@@ -1652,13 +1945,11 @@ def synthetic_lab() -> None:
     fig.update_layout(xaxis_title="x", yaxis_title="y", legend_orientation="h")
     st.plotly_chart(fig, width="stretch", config=plot_config)
 
+    plain_lab_reading(n, a, b, var, seed)
     show_metrics(result)
-    metric_explanation(result)
-    model_profile(result)
-    show_model_equation(result, ["x"], "y")
+    interpretation_panel(result, ["x"], "y")
 
-    st.markdown(f"#### {t('outliers')}")
-    residual_scope_note()
+    residual_heading_with_tooltip()
     show_dataframe(
         df.sort_values("abs_residual", ascending=False)
         .head(10)[["rank", "x", "y", "predicted_y", "residual", "abs_residual"]],
@@ -1670,7 +1961,6 @@ def synthetic_lab() -> None:
         <div class="source-card">
             <h4>{t("synthetic_source_title")}</h4>
             <p>{t("synthetic_source_body")}</p>
-            <p>{t("synthetic_purpose")}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1689,7 +1979,6 @@ def aqi_case() -> None:
 
     raw_df = pd.read_csv(SAMPLE_AQI_PATH)
     df = normalize_aqi_columns(raw_df)
-    full_row_count = len(df)
 
     numeric_cols = get_numeric_columns(df)
     if len(numeric_cols) < 2:
@@ -1711,12 +2000,16 @@ def aqi_case() -> None:
     if not st.session_state.sidebar_collapsed:
         with st.sidebar:
             st.markdown(f"### {t('aqi_params')}")
+            region_options = list(REGION_FILTERS.keys())
+            current_region = st.session_state.get("aqi_region", "central")
             region_key = st.selectbox(
                 t("region"),
-                list(REGION_FILTERS.keys()),
+                region_options,
+                index=region_options.index(current_region) if current_region in region_options else 0,
                 format_func=region_label,
-                key="aqi_region",
+                key=localized_key("aqi_region"),
             )
+            st.session_state.aqi_region = region_key
             target_col = st.selectbox(
                 t("target"),
                 numeric_cols,
@@ -1730,12 +2023,15 @@ def aqi_case() -> None:
                 default=[col for col in default_features if col in feature_options],
                 key="aqi_features",
             )
+            current_model = st.session_state.get("aqi_model_choice", "ols")
             model_key = st.selectbox(
                 t("model_choice"),
                 available_models,
+                index=available_models.index(current_model) if current_model in available_models else 0,
                 format_func=model_label,
-                key="aqi_model_choice",
+                key=localized_key("aqi_model_choice"),
             )
+            st.session_state.aqi_model_choice = model_key
     else:
         region_key = st.session_state.get("aqi_region", "central")
         target_col = st.session_state.get("aqi_target", default_target)
@@ -1747,6 +2043,7 @@ def aqi_case() -> None:
         model_key = st.session_state.get("aqi_model_choice", "ols")
 
     df = filter_by_region(df, region_key)
+    filtered_row_count = len(df)
 
     if not selected_features:
         st.warning(t("select_feature"))
@@ -1771,63 +2068,47 @@ def aqi_case() -> None:
         {"feature": selected_features, "coefficient": result["coefficients"]}
     ).sort_values("coefficient", key=lambda s: s.abs(), ascending=False)
 
-    st.markdown(
-        f"""
-        <div class="source-card">
-            <h4>{t("model_choice")}</h4>
-            <p><strong>{t("region")}:</strong> {region_label(region_key)}</p>
-            <p><strong>{t("target")}:</strong> {target_col}</p>
-            <p><strong>{t("features")}:</strong> {", ".join(selected_features)}</p>
-            <p><strong>{t("model")}:</strong> {result["model_name"]}</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    fig = px.scatter(
+        model_df,
+        x="predicted",
+        y=target_col,
+        color="abs_residual",
+        hover_data=selected_features,
+        color_continuous_scale="Reds",
+        title=t("actual_predicted"),
     )
+    min_val = float(min(model_df["predicted"].min(), model_df[target_col].min()))
+    max_val = float(max(model_df["predicted"].max(), model_df[target_col].max()))
+    fig.add_trace(
+        go.Scatter(
+            x=[min_val, max_val],
+            y=[min_val, max_val],
+            mode="lines",
+            name=t("perfect_prediction"),
+            line={"dash": "dash", "color": theme["plot_axis"]},
+        )
+    )
+    apply_plot_style(fig, height=480, title=t("actual_predicted"))
+    st.plotly_chart(fig, width="stretch", config=plot_config)
 
-    left, right = st.columns([1.5, 1])
-    with left:
-        fig = px.scatter(
-            model_df,
-            x="predicted",
-            y=target_col,
-            color="abs_residual",
-            hover_data=selected_features,
-            color_continuous_scale="Reds",
-            title=t("actual_predicted"),
-        )
-        min_val = float(min(model_df["predicted"].min(), model_df[target_col].min()))
-        max_val = float(max(model_df["predicted"].max(), model_df[target_col].max()))
-        fig.add_trace(
-            go.Scatter(
-                x=[min_val, max_val],
-                y=[min_val, max_val],
-                mode="lines",
-                name=t("perfect_prediction"),
-                line={"dash": "dash", "color": "#475569"},
-            )
-        )
-        apply_plot_style(fig, height=440, title=t("actual_predicted"))
-        st.plotly_chart(fig, width="stretch", config=plot_config)
-    with right:
-        st.markdown(f"#### {t('coefficients')}")
+    plain_aqi_reading(model_df, target_col)
+    show_metrics(result)
+    interpretation_panel(result, selected_features, target_col)
+
+    with st.expander(t("coefficients")):
         if result["model_key"] != "ols":
             st.caption(t("coefficient_note"))
         show_dataframe(coefficient_df, width="stretch", hide_index=True)
 
-    show_metrics(result)
-    plain_aqi_reading(model_df, target_col)
-    metric_explanation(result)
-    model_profile(result)
-    show_model_equation(result, selected_features, target_col)
-    st.markdown(f"#### {t('model_comparison')}")
-    show_dataframe(
-        compare_linear_models(model_df[selected_features], model_df[target_col]),
-        width="stretch",
-        hide_index=True,
-    )
+    with st.expander(t("model_comparison")):
+        st.markdown(t("model_comparison_note"))
+        show_dataframe(
+            compare_linear_models(model_df[selected_features], model_df[target_col]),
+            width="stretch",
+            hide_index=True,
+        )
 
-    st.markdown(f"#### {t('top_outliers')}")
-    residual_scope_note()
+    residual_heading_with_tooltip()
     preferred_cols = [
         col
         for col in [
@@ -1850,7 +2131,7 @@ def aqi_case() -> None:
     )
     if not AQI_DATA_IS_PRIMARY:
         st.warning(t("local_historical_warning") if AQI_DATA_IS_LOCAL_HISTORICAL else t("no_active_data"))
-    st.markdown(dataset_status_html(full_row_count, len(model_df)), unsafe_allow_html=True)
+    st.markdown(dataset_status_html(filtered_row_count, len(model_df)), unsafe_allow_html=True)
 
 
 st.markdown(
@@ -1879,13 +2160,11 @@ st.markdown(
 
 active_page = page_navigation()
 
-if active_page == "lab":
+if active_page == "simulator":
     synthetic_lab()
 elif active_page == "aqi":
     aqi_case()
 elif active_page == "data":
-    st.subheader(t("source_title"))
-    st.markdown(t("source_body"))
-    source_download_panel("source", include_report=False)
+    data_source_tab()
 else:
     crisp_report_tab()
