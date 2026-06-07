@@ -182,7 +182,7 @@ TEXT = {
         "report_value_body": "The model does not declare air quality safe or unsafe. It reduces review workload by ranking unusual records first, so analysts can inspect station issues, weather effects, pollutant spikes or data-quality problems sooner.",
         "report_limit_title": "Governance limits",
         "report_limit_body": "Use the output as a screening layer. Official alerts, enforcement, health guidance and resident-facing risk messages still require domain review and official monitoring rules.",
-        "github_repo_btn": "GitHub Repository",
+        "github_repo_btn": "GitHub",
     },
     "zh": {
         "page_title": "線性迴歸實作",
@@ -316,7 +316,7 @@ TEXT = {
         "report_value_body": "模型不判定空氣安全或危險，而是把最不容易被 baseline 解釋的紀錄排到前面，協助分析人員更快檢查測站異常、天候影響、污染物突增或資料品質問題。",
         "report_limit_title": "治理限制",
         "report_limit_body": "此結果適合作為篩選層。正式警示、稽查、健康建議與居民風險溝通，仍需結合專業審查與官方監測規範。",
-        "github_repo_btn": "GitHub 專案倉庫",
+        "github_repo_btn": "GitHub",
     },
 }
 
@@ -1609,7 +1609,7 @@ def report_markdown(locale: str | None = None) -> str:
 
 ## 2. 數據理解 (Data Understanding)
 *   **數據來源、範疇與交代 (Data Sources)**：
-    *   專案內建資料集：採用託管於 GitHub 專案倉庫目錄下的真實世界資料集 `data/{active_file}`，共計 {SAMPLE_AQI_ROWS:,} 筆。考量地理特徵與效能限制，地理範疇控制在台中、彰化及南投測站數據。
+    *   專案內建資料集：採用託管於 GitHub 專案目錄下的真實世界資料集 `data/{active_file}`，共計 {SAMPLE_AQI_ROWS:,} 筆。考量地理特徵與效能限制，地理範疇控制在台中、彰化及南投測站數據。
     *   官方歷史參考：環境部官方歷史監測資料庫 `MOENV AQX_P_488`，為歷史大數據比對的主體。
     *   即時觀測參考：環境部官方即時指標 `MOENV AQX_P_432`，作即時動態比對。
     *   封存替代方案：`Kaggle Taiwan Air Quality Data (2016~2024)`，用於離線可重現性分析。
