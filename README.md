@@ -1,6 +1,6 @@
 # Linear Regression Practice
 
-本專案為第四份職前培訓實務作業，是一個基於 Python 與 Streamlit 的互動式線性迴歸分析與異常偵測展示工具。專案採用 CRISP-DM（跨行業數據挖掘標準流程）框架，系統性整合「迴歸模擬器」與「中部空氣品質實例（AQI 建模）」，實踐以迴歸殘差進行污染異常觀測篩選的決策支持系統原型。
+本專案基於 Python 與 Streamlit 實作一互動式線性迴歸分析與異常偵測的展示平台，並採用 CRISP-DM（跨行業數據挖掘標準流程）框架，系統性整合「迴歸模擬器」與「中部空氣品質實例（AQI 建模）」，以迴歸殘差進行污染異常觀測篩選來支持後續決策規劃。
 
 🔗 [**Live Demo**](https://linear-regression-practice-dec591nyc.streamlit.app/)
 
